@@ -1,0 +1,92 @@
+# Silhouette credits
+
+Silhouettes come from [PhyloPic](https://www.phylopic.org) under the licences listed. Only CC0, public-domain and CC BY images are used.
+
+- **Accipitridae** (CC0) by Lauren Anderson — https://www.phylopic.org/images/e00734a7-e8a8-4fe5-b5a9-58d927ca451a
+- **Acinonyx jubatus** (CC0) by nicubunu — https://www.phylopic.org/images/6290407d-2193-4d97-a194-2a7afc8f89c6
+- **Acrididae** (CC0) by Andy Wilson — https://www.phylopic.org/images/e7ba011c-6172-47ca-84bf-0dfc87b47a32
+- **Aepyornis maximus** (CC0) by Ferran Sayol — https://www.phylopic.org/images/fe387db8-6863-4898-be7c-4a6c001e186f
+- **Ailuropoda melanoleuca** (Public Domain) no credit required — https://www.phylopic.org/images/4b1f7a58-8713-4d6e-a130-4c8a1ac2f749
+- **Alligator mississippiensis** (CC0) by Ferran Sayol — https://www.phylopic.org/images/eefc0a4d-24b5-4c91-b687-8bd28c414295
+- **Alligator sinensis** (CC BY 4.0) by Wani2Y — https://www.phylopic.org/images/fddc8b3c-20a3-4e7b-8c9c-be62e52aa2ab
+- **Ambystoma mexicanum** (CC0) by Jake Warner — https://www.phylopic.org/images/575eaa51-6c9b-4d36-9881-b8463c68ebbc
+- **Anatidae** (CC0) by Kai Caspar — https://www.phylopic.org/images/76e7ec55-7205-49ef-85f7-fd842350306c
+- **Andrias davidianus** (CC0) by Chuanixn Yu — https://www.phylopic.org/images/dd44eb4f-f4d1-4557-939e-44f35694b615
+- **Anodorhynchus hyacinthinus** (CC0) no credit required — https://www.phylopic.org/images/0e752edb-ec92-4f5e-b988-2b22566a196e
+- **Aptenodytes forsteri** (CC BY 4.0) by Edwin Price — https://www.phylopic.org/images/9e11df09-bd24-463a-9020-bdce4111537f
+- **Ardeotis** (CC0) no credit required — https://www.phylopic.org/images/b46a2d4a-d45f-4d7b-b243-9da2c7153f2b
+- **Balaenoptera musculus** (Public Domain) no credit required — https://www.phylopic.org/images/6ca9f0b7-cacb-45cc-9229-1b672d55b15b
+- **Bison bison** (CC0) by Tracy A. Heath — https://www.phylopic.org/images/d44d834e-1c32-4a08-a5d5-f30139de4450
+- **Bos taurus** (CC BY 4.0) by Ivan Iofrida — https://www.phylopic.org/images/0ebe16cb-4c74-4c77-9643-9e531a0840cc
+- **Canidae** (CC BY 3.0) by Brian Gratwicke (photo) and T. Michael Keesey (vectorization) — https://www.phylopic.org/images/20da6c7c-2584-4cee-921b-ebd09384567b
+- **Canis dirus** (CC0) by Margot Michaud — https://www.phylopic.org/images/d913b75d-3055-48e2-b597-78cfbceac165
+- **Canis lupus** (CC0) by Steven Traver — https://www.phylopic.org/images/5036f260-5a0d-42c5-a0bd-9eb0729e54e0
+- **Capra** (CC0) by Steven Traver — https://www.phylopic.org/images/2b07a361-5d1b-4bb9-a61e-a7708cf57ecb
+- **Carcharodon carcharias** (CC0) by Steven Traver — https://www.phylopic.org/images/545d45f0-0dd1-4cfd-aad6-2b835223ea0d
+- **Ceratotherium** (CC0) by Oscar Sanisidro — https://www.phylopic.org/images/fdfaac80-2382-4d80-888b-bca2ca3ca2e7
+- **Chelonoidis** (CC0) by Kai Caspar — https://www.phylopic.org/images/760cced8-4303-49b4-bc4c-bf74ec652304
+- **Chelonoidis abingdonii** (CC BY 3.0) by Roberto Díaz Sibaja — https://www.phylopic.org/images/07842f70-820e-43ec-91d9-f9d09d0df987
+- **Coelodonta antiquitatis** (CC0) by Steven Traver — https://www.phylopic.org/images/e6d3526b-9ce9-4144-96e0-b2587b4c6a74
+- **Columbidae** (CC0) by Andy Wilson — https://www.phylopic.org/images/f0f6f353-32e7-4717-be55-58c36592afc1
+- **Danaus plexippus** (CC0) by Andy Wilson — https://www.phylopic.org/images/e6705593-91ba-4b6e-9dfd-515005e35fc6
+- **Dermochelys coriacea** (CC0) by Neil Kelley — https://www.phylopic.org/images/a1fa1020-ec8e-4bb0-94e8-2f678c4fecac
+- **Dicerorhinus sumatrensis** (CC0) by Christophe Mallet — https://www.phylopic.org/images/b588650a-14a7-4b32-9010-f0383b07131b
+- **Diceros bicornis** (CC0) by Steven Traver — https://www.phylopic.org/images/90839fda-8f63-4609-abed-25a7fb73c39c
+- **Dinornis** (CC0) by Steven Traver — https://www.phylopic.org/images/e7657f52-5d6f-4746-a9f4-b3d1ede2251a
+- **Diprotodon optatum** (CC0) by Steven Traver — https://www.phylopic.org/images/0dd852df-bb80-456f-ab3f-d8bf011ca2a1
+- **Elephas maximus** (CC BY 3.0) by T. Michael Keesey — https://www.phylopic.org/images/7c9ab182-175d-4f02-96d0-09c1e5212bff
+- **Enhydra lutris** (CC0) by Margot Michaud — https://www.phylopic.org/images/d3a78afb-1b9e-45e0-b6f4-144d79f399f0
+- **Equus quagga** (CC BY 4.0) by Natalie Kestel — https://www.phylopic.org/images/e7a27ff3-ac08-4224-8846-f30b833b677c
+- **Felis fatalis** (CC0) by Steven Traver — https://www.phylopic.org/images/cc04733f-befe-4fbc-948c-9cfd9180c90f
+- **Fringillidae** (CC0) by Ferran Sayol — https://www.phylopic.org/images/c0535f8a-a119-44e3-8343-e55a3bc84e58
+- **Gavialis gangeticus** (CC0) by Jagged Fang Designs — https://www.phylopic.org/images/f963f388-8297-4ceb-91f6-493b38dccba5
+- **Giraffa** (CC0) by Matthew Speight — https://www.phylopic.org/images/7a0981e5-7614-4922-8e92-42098499cc8b
+- **Gorilla gorilla** (CC0) by T. Michael Keesey (after Colin M. L. Burnett) — https://www.phylopic.org/images/d9af529d-e426-4c7a-922a-562d57a7872e
+- **Grus** (CC BY 4.0) by Mathieu Pélissié — https://www.phylopic.org/images/5d6a2703-c087-4f58-a14d-0bbc55131100
+- **Gymnogyps californianus** (CC BY 3.0) by Stacy Spensley (Modified) — https://www.phylopic.org/images/73528af2-c4ca-4bc4-81ca-d22126220fa9
+- **Haliaeetus leucocephalus** (CC BY 3.0) by Ron Holmes/U. S. Fish and Wildlife Service (source photo), T. Michael Keesey (vectorization) — https://www.phylopic.org/images/9fbdceb3-6183-415f-8647-3783bc7cfa18
+- **Hippopotamus amphibius** (Public Domain) by Evan Boucher — https://www.phylopic.org/images/3769e205-b10c-4aab-affc-b4f0302f4eaa
+- **Hippotragus** (CC0) by Mathew Stewart — https://www.phylopic.org/images/a6c8cc22-c035-48e1-bd2a-98a29446b392
+- **Huso huso** (Public Domain) by Robbie Cada — https://www.phylopic.org/images/cd7e54b4-aff4-48c8-9159-c8977ff07717
+- **Hydrodamalis gigas** (Public Domain) no credit required — https://www.phylopic.org/images/23389deb-fe10-4c97-87c4-a606ebd1fec3
+- **Hylidae** (CC0) by Robbi Bishop-Taylor — https://www.phylopic.org/images/b473d928-ba9f-4227-992f-d255094e8a9d
+- **Incilius** (CC0) by Jose Carlos Arenas-Monroy — https://www.phylopic.org/images/ec29cbcc-8a65-41fd-adb0-80f52554e242
+- **Latimeria chalumnae** (CC0) no credit required — https://www.phylopic.org/images/9785c4ca-e881-4e42-b359-212dd9c38aee
+- **Lipotes vexillifer** (CC0) no credit required — https://www.phylopic.org/images/0cbba297-38c8-419e-8ba3-e783619c354f
+- **Loxodonta africana** (CC0) by Steven Traver — https://www.phylopic.org/images/62398ac0-f0c3-48f8-8455-53512a05fbc4
+- **Lycaenidae** (CC0) by Mattia Menchetti — https://www.phylopic.org/images/5aeaf558-3c48-4173-83b4-dbf2846f8d75
+- **Lycaon pictus** (CC0) by Holly English — https://www.phylopic.org/images/c974b08c-1189-48db-afc6-edf54356abb4
+- **Lynx pardinus** (CC0) by Margot Michaud — https://www.phylopic.org/images/20442a12-596d-4987-a668-509c19a155da
+- **Mammuthus primigenius** (CC0) by Amy Beauvois — https://www.phylopic.org/images/6f0acd79-1f7d-402f-8679-dc3036b1a504
+- **Megaloceros giganteus** (CC0) by Steven Traver — https://www.phylopic.org/images/a85b378b-2287-4cf1-a0f1-0ad53cd56f56
+- **Megaptera novaeangliae** (Public Domain) no credit required — https://www.phylopic.org/images/fd8d3e5e-24a0-4aa2-9211-987ff86007dd
+- **Muridae** (CC0) by An Ignorant Atheist — https://www.phylopic.org/images/ba1d31e7-2679-418b-9df6-71dbbbac78d9
+- **Mustela** (CC0) by Margot Michaud — https://www.phylopic.org/images/a69bb26c-a153-49cd-b52b-a5a31760e9d9
+- **Neomonachus tropicalis** (CC BY 3.0) by Zimices — https://www.phylopic.org/images/dcc27b9e-1bdc-4178-ade9-30a3d20c9806
+- **Pan troglodytes** (CC BY 3.0) by T. Michael Keesey (vectorization) and Tony Hisgett (photography) — https://www.phylopic.org/images/2f7da8c8-897a-445e-b003-b3955ad08850
+- **Panthera leo** (Public Domain) no credit required — https://www.phylopic.org/images/e2015ba3-4f7e-4950-9bde-005e8678d77b
+- **Panthera onca** (CC0) by Margot Michaud — https://www.phylopic.org/images/c5362c8a-0c93-41f5-9d4d-674dbe231318
+- **Panthera pardus** (CC0) by Margot Michaud — https://www.phylopic.org/images/9f33e613-944c-483d-8275-cc59a1b470c2
+- **Panthera tigris** (CC0) by Steven Traver — https://www.phylopic.org/images/e148eabb-f138-43c6-b1e4-5cda2180485a
+- **Pezophaps solitaria** (CC0) by Sara Citron — https://www.phylopic.org/images/350b04ba-0701-44f9-b01c-2bd3582f0091
+- **Phascolarctos cinereus** (CC BY 3.0) by Sarah Werning — https://www.phylopic.org/images/8a06d489-024f-4505-8ccb-f86e84e00e75
+- **Phasmatidae** (CC0) by Christoph Schomburg — https://www.phylopic.org/images/0bcddcb4-493c-4a71-99d9-1118c7ffe511
+- **Phocoena sinus** (CC0) no credit required — https://www.phylopic.org/images/4b2f3f8f-93f3-49e9-9a20-325e11602b7e
+- **Phyllobates terribilis** (CC0) by Andy Wilson — https://www.phylopic.org/images/be8bb25e-d825-49a1-ae9f-0289efb8d410
+- **Pinguinus impennis** (Public Domain) by John James Audubon (Modified) — https://www.phylopic.org/images/1eb2195d-8035-4d59-bfe2-ee7af9ca0132
+- **Polyodontidae** (CC0) no credit required — https://www.phylopic.org/images/01d1b294-736a-4f66-9ad2-2082427d9574
+- **Pongo pygmaeus** (CC BY 3.0) by Gareth Monger — https://www.phylopic.org/images/63c557ce-d82c-42e6-a26a-a9f0f05c2c18
+- **Psittacidae** (CC0) by Ferran Sayol — https://www.phylopic.org/images/07a8ddc3-6440-4ca8-80e6-ccdaa988a968
+- **Raphus cucullatus** (CC0) by Steven Traver — https://www.phylopic.org/images/01bbffec-312c-493a-bcd3-e9361ed3435d
+- **Rheobatrachus** (CC0) by Jose Carlos Arenas-Monroy — https://www.phylopic.org/images/b05d80ba-18ab-46b1-97ad-7ff72fabba0a
+- **Rhincodon typus** (CC0) no credit required — https://www.phylopic.org/images/fc816f8b-005d-4414-b962-1b99ed5129fe
+- **Rhinoceros unicornis** (Public Domain) by H. F. O. March (vectorized by T. Michael Keesey) — https://www.phylopic.org/images/abad209c-2ca1-423b-a66b-317ca52f4c78
+- **Sarcophilus harrisii** (CC BY 3.0) by Sarah Werning — https://www.phylopic.org/images/58cc56c2-5a36-4031-be9f-28c86f77963c
+- **Spheniscus demersus** (CC BY 4.0) by Edwin Price — https://www.phylopic.org/images/b0a4d3d9-f8d5-4457-a39a-93e7ca8d83fc
+- **Thunnus thynnus** (CC0) by Stuart Humphries — https://www.phylopic.org/images/16989401-0080-4502-828d-e85a45a262be
+- **Thylacinus cynocephalus** (CC0) by Steven Traver — https://www.phylopic.org/images/55e1c3e9-940c-486a-90d7-4b8e5663d248
+- **Uncia uncia** (CC0) by Margot Michaud — https://www.phylopic.org/images/cb44ff49-165e-4c97-9a94-98f512dda64f
+- **Ursus arctos** (CC0) by Tracy A. Heath — https://www.phylopic.org/images/43e82541-0f4a-467c-864e-f7f44c38b5af
+- **Ursus maritimus** (CC0) by Tracy A. Heath — https://www.phylopic.org/images/c11b4873-aa21-4394-9f5e-6996033c379f
+- **Ursus spelaeus** (CC0) by Tracy A. Heath — https://www.phylopic.org/images/da8a59b3-d3ec-4ed6-9dbc-5c48532115bf
+- **Varanus komodoensis** (CC0) by Steven Traver — https://www.phylopic.org/images/ce6a78bc-3ef1-4d60-ab40-113eb84c7802

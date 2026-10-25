@@ -4,6 +4,7 @@
   import { formatYear } from '../lib/time';
   import Icon from './Icon.svelte';
   import Logo from './Logo.svelte';
+  import Silhouette from './Silhouette.svelte';
   import StatusMark from './StatusMark.svelte';
 
   interface Props {
@@ -129,6 +130,7 @@
               aria-pressed={a.id === selectedId}
               onclick={() => onselect(a.id)}
             >
+              <span class="art" style="--w: 38px; --h: 26px"><Silhouette src={a.silhouette?.file} /></span>
               <span class="names">
                 <span class="name">{a.name}</span>
                 <span class="sci">{a.scientific}</span>
@@ -352,6 +354,20 @@
   }
   .item.sel .name {
     font-weight: 600;
+  }
+  .art {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    color: var(--ink-2);
+  }
+  .item.gone .art {
+    color: var(--muted);
+    opacity: 0.55;
+  }
+  .item.sel .art {
+    color: var(--accent-ink);
   }
   .names {
     flex: 1;

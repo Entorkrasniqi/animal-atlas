@@ -189,7 +189,7 @@ export const livingMammals = [
       [S, 'ZAF NAM BWA ZWE MOZ SWZ ZMB AGO'],
       [1895, 'ZAF'],
       [1960, 'ZAF SWZ NAM BWA ZWE'],
-      [2000, 'ZAF SWZ NAM BWA ZWE KEN ZMB MOZ'],
+      [2000, 'ZAF SWZ NAM BWA ZWE KEN ZMB MOZ UGA'],
     ],
     pop: [
       [1895, 100],
@@ -577,7 +577,7 @@ export const livingMammals = [
     range: [
       [
         S,
-        'USA MEX CAN CHL PER ECU COL CRI PAN AUS NZL ZAF NAM MOZ MDG IND LKA IDN JPN RUS CHN KOR ISL NOR GRL BRA ARG URY ATA',
+        'USA MEX CAN CHL PER ECU COL CRI PAN AUS NZL ZAF NAM MOZ MDG IND LKA IDN JPN RUS CHN KOR ISL NOR GRL BRA ARG URY PRT ATA',
       ],
     ],
     pop: [
@@ -982,6 +982,7 @@ export const extinctMammals = [
     id: 'sea-mink',
     name: 'Sea mink',
     sci: 'Neogale macrodon',
+    hints: { gbif: 'Neovison macrodon' },
     group: 'mammal',
     status: 'EX',
     extinct: 1894,

@@ -36,6 +36,7 @@ export const livingOthers = [
     id: 'galapagos-tortoise',
     name: 'Galápagos giant tortoise',
     sci: 'Chelonoidis niger complex',
+    hints: { gbif: 'Chelonoidis', wikipedia: 'Galápagos tortoise' }, // a group of species; 'C. niger' is the extinct Floreana tortoise
     group: 'reptile',
     status: 'VU',
     about:
@@ -156,7 +157,7 @@ export const livingOthers = [
     range: [
       [
         S,
-        'MEX USA BLZ HND BRA CUB AUS IDN PHL THA IND LKA MDV MOZ TZA KEN MDG SOM OMN YEM DJI ERI EGY SAU JPN TWN CHN',
+        'MEX USA BLZ HND BRA CUB ECU PER CRI AUS IDN PHL THA IND LKA MDV MOZ TZA KEN MDG SOM OMN YEM DJI ERI EGY SAU JPN TWN CHN',
       ],
     ],
   }),
@@ -198,7 +199,7 @@ export const livingOthers = [
     range: [
       [
         S,
-        'USA CAN MEX BRA ISL NOR GBR IRL FRA ESP PRT ITA MLT GRC TUR TUN LBY EGY MAR DZA HRV JPN',
+        'USA CAN MEX BRA ISL NOR SWE GBR IRL FRA ESP PRT ITA MLT GRC TUR TUN LBY EGY MAR DZA HRV JPN',
       ],
     ],
   }),

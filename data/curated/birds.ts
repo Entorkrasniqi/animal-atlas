@@ -150,6 +150,7 @@ export const extinctBirds = [
     id: 'moa',
     name: 'South Island giant moa',
     sci: 'Dinornis robustus',
+    hints: { gbif: 'Dinornis' }, // GBIF lists only the genus for the South Island giant moa
     group: 'bird',
     status: 'EX',
     extinct: 1445,
@@ -166,6 +167,7 @@ export const extinctBirds = [
     id: 'haasts-eagle',
     name: 'Haast’s eagle',
     sci: 'Hieraaetus moorei',
+    hints: { gbif: 'Harpagornis moorei', wikipedia: "Haast's eagle" },
     group: 'bird',
     status: 'EX',
     extinct: 1400,

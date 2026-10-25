@@ -1,10 +1,12 @@
 <script lang="ts">
+  import { dataDate } from '../data';
   import { countryName } from '../lib/geo';
   import { isExtinctAt, populationAt, rangeAt } from '../lib/state';
   import { MAX_YEAR, formatCount, formatYear, roundSig, yearsAgo } from '../lib/time';
   import { GROUP_LABEL, STATUS_LABEL, type Animal } from '../lib/types';
   import Icon from './Icon.svelte';
   import PopulationChart from './PopulationChart.svelte';
+  import Silhouette from './Silhouette.svelte';
   import StatusMark from './StatusMark.svelte';
 
   interface Props {
@@ -57,8 +59,17 @@
   <header>
     <p class="eyebrow">{GROUP_LABEL[animal.group].replace(/s$/, '')}</p>
     <button type="button" class="close" onclick={onclose} aria-label="Close details"><Icon name="close" size={16} /></button>
-    <h2>{animal.name}</h2>
-    <p class="sci">{animal.scientific}</p>
+    <div class="title">
+      <div>
+        <h2>{animal.name}</h2>
+        <p class="sci">{animal.scientific}</p>
+      </div>
+      {#if animal.silhouette}
+        <div class="art" style="--w: 92px; --h: 58px">
+          <Silhouette src={animal.silhouette.file} label="Silhouette of {animal.silhouette.taxon}" />
+        </div>
+      {/if}
+    </div>
   </header>
 
   <div class="state">
@@ -91,8 +102,11 @@
       <dd>{codes.length}<small>{codes.length === 1 ? 'country' : 'countries'}</small></dd>
     </div>
     <div>
-      <dt>IUCN today</dt>
-      <dd class="iucn"><StatusMark kind={animal.status} /><small>{STATUS_LABEL[animal.status]}</small></dd>
+      <dt>{animal.statusSource === 'iucn' ? 'IUCN today' : 'Status'}</dt>
+      <dd class="iucn">
+        <StatusMark kind={animal.status} />
+        <small>{STATUS_LABEL[animal.status]}{animal.statusSource === 'iucn' ? '' : ', not on the Red List'}</small>
+      </dd>
     </div>
   </dl>
   <p class="note">{popNote}</p>
@@ -109,8 +123,7 @@
   <div class="where">
     <h3>{extinct ? 'Last known range' : `Where it lives in ${formatYear(year)}`}</h3>
     <p class="countries">
-      {#each shown as c, i (c.code)}<button type="button" onclick={() => onpickcountry(c.code)} title="Show animals found in {c.name}">{c.name}</button>{i < shown.length - 1 ? ', ' : ''}{/each}{#if names.length > LIMIT && !showAll}
-        <span class="more-sep">…</span>{/if}
+      {#each shown as c, i (c.code)}<span class="nw"><button type="button" onclick={() => onpickcountry(c.code)} title="Show animals found in {c.name}">{c.name}</button>{i < shown.length - 1 || (names.length > LIMIT && !showAll) ? ',' : ''}</span>{' '}{/each}{#if names.length > LIMIT && !showAll}…{/if}
     </p>
     {#if names.length > LIMIT}
       <button type="button" class="link" onclick={() => (showAll = !showAll)}>
@@ -128,8 +141,43 @@
     {/if}
   </div>
 
+  <div class="sources">
+    <h3>Sources</h3>
+    {#if animal.sources?.length}
+      <ul class="links">
+        {#each animal.sources as link (link.label)}
+          <li>
+            <a href={link.url} target="_blank" rel="noopener noreferrer">{link.label}<Icon name="external" size={12} /></a>
+          </li>
+        {/each}
+      </ul>
+    {/if}
+
+    {#if animal.notes?.length}
+      <details class="how">
+        <summary>How this entry was built</summary>
+        <ul>
+          {#each animal.notes as note}
+            <li>{note}</li>
+          {/each}
+        </ul>
+      </details>
+    {/if}
+
+    {#if animal.silhouette}
+      {@const sil = animal.silhouette}
+      <p class="credit">
+        Silhouette of {sil.rank === 'species' ? sil.taxon : `the ${sil.rank} ${sil.taxon}, a close relative`}{sil.credit
+          ? `, by ${sil.credit}`
+          : ''}
+        (<a href={sil.licenseUrl} target="_blank" rel="noopener noreferrer">{sil.license}</a>) via
+        <a href={sil.pageUrl} target="_blank" rel="noopener noreferrer">PhyloPic</a>.
+      </p>
+    {/if}
+  </div>
+
   <p class="fine">
-    Figures are rounded estimates compiled from IUCN, WWF and published studies. Ranges are simplified to modern-day countries.
+    Figures are rounded estimates; ranges are simplified to modern-day countries. Data refreshed {dataDate}.
   </p>
 </section>
 
@@ -148,6 +196,17 @@
   header {
     position: relative;
     padding-right: 32px;
+  }
+  .title {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .art {
+    flex: none;
+    color: var(--ink);
+    opacity: 0.88;
   }
   .eyebrow {
     margin: 0 0 8px;
@@ -305,6 +364,9 @@
     line-height: 1.65;
     color: var(--ink-2);
   }
+  .nw {
+    white-space: nowrap;
+  }
   .countries button {
     padding: 0;
     border: 0;
@@ -351,6 +413,64 @@
     border-color: var(--ink-2);
   }
 
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .sources a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 3px;
+  }
+  .sources a:hover {
+    color: var(--accent-ink);
+    text-decoration-color: var(--accent);
+  }
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13.5px;
+  }
+  .links a :global(svg) {
+    color: var(--muted);
+  }
+  .how {
+    margin-top: 10px;
+    font-size: 12.5px;
+    color: var(--ink-2);
+  }
+  .how summary {
+    cursor: pointer;
+    color: var(--ink-2);
+    font-weight: 500;
+  }
+  .how summary:hover {
+    color: var(--accent-ink);
+  }
+  .how ul {
+    margin: 8px 0 0;
+    padding-left: 18px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  .how li + li {
+    margin-top: 4px;
+  }
+  .credit {
+    margin: 10px 0 0;
+    font-size: 12px;
+    line-height: 1.45;
+    color: var(--muted);
+  }
+  .credit a {
+    color: var(--ink-2);
+  }
   .fine {
     margin: auto 0 0;
     padding-top: 6px;

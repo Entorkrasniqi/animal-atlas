@@ -11,13 +11,37 @@ export interface RangeStage {
   countries: string[];
 }
 
+/** A silhouette from PhyloPic, self-hosted under /silhouettes. */
+export interface Silhouette {
+  /** Public path, e.g. "/silhouettes/tiger.svg". */
+  file: string;
+  /** Contributor to credit (empty for public-domain images). */
+  credit: string;
+  /** Short licence name, e.g. "CC0" or "CC BY 4.0". */
+  license: string;
+  licenseUrl: string;
+  /** The image's page on PhyloPic. */
+  pageUrl: string;
+  /** How closely the image matches: the species itself, or a close relative. */
+  rank: 'species' | 'genus' | 'family' | 'order';
+  /** Name of the taxon the image depicts, e.g. "Panthera tigris" or "Felidae". */
+  taxon: string;
+}
+
+export interface SourceLink {
+  label: string;
+  url: string;
+}
+
 export interface Animal {
   id: string;
   name: string;
   scientific: string;
   group: Group;
-  /** Latest IUCN category. */
+  /** Conservation category: IUCN's where it assessed this taxon, otherwise curated. */
   status: IucnStatus;
+  /** Where `status` came from. */
+  statusSource?: 'iucn' | 'curated';
   /** Year the species was lost (negative = BCE). Absent for living species. */
   extinctYear?: number;
   about: string;
@@ -29,6 +53,13 @@ export interface Animal {
   population?: [number, number][];
   /** What `population` counts. Defaults to "individuals". */
   popUnit?: string;
+
+  // --- filled in by the data pipeline (see scripts/pipeline) ---
+  silhouette?: Silhouette;
+  /** Where to read more. */
+  sources?: SourceLink[];
+  /** Plain-language notes on how this entry was built and checked. */
+  notes?: string[];
 }
 
 export const GROUP_LABEL: Record<Group, string> = {
