@@ -12,6 +12,7 @@ const MIN_GAP_MS: Record<string, number> = {
   'api.phylopic.org': 120,
   'images.phylopic.org': 120,
   'en.wikipedia.org': 100,
+  'raw.githubusercontent.com': 300,
 };
 
 let refresh = false;

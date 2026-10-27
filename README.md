@@ -4,7 +4,10 @@ An interactive world map of 100 animals — 58 living, 42 extinct. Pick an anima
 timeline from **50,000 BCE to today**, and watch where it lives, how many remain, or when and where it
 disappeared.
 
-- **Map** – shows *where in* its countries the animal has been recorded, as a heat surface: pale blue
+- **Map** – a real reference map under the animals: country names, capitals and cities, state and
+  province borders and names, lakes and rivers. What shows depends on zoom, so the world view stays
+  clean and a reserve zoomed to 60× has its nearest towns and provinces named. Hover for the place
+  (city, province, country) and how common the animal is there. The map also shows *where in* its countries the animal has been recorded, as a heat surface: pale blue
   where it is rare, through sand and orange, to dark red where it is most common. Land animals stop at
   the coast and at the borders of their countries; sea animals are painted on the water. Once extinct,
   the last known range stays in muted violet-greys. Hover for how common it is at that spot. Scroll/pinch
@@ -55,9 +58,20 @@ PhyloPic · Wikipedia┘                           data/generated/report.md     
 | IUCN Red List, mirrored by GBIF | Conservation status | **Overrides** the curated status when IUCN assessed exactly that taxon |
 | GBIF occurrences | Where observers and museums recorded the species | **Confirms** the curated range ("9 of 11 countries have records since 1990"). Never extends it: counts show where people look, not where animals live (tigers have zoo records in the US) |
 | GBIF density tiles | Sighting counts per ~0.35° cell (about 39 km) | **Draws the map**: where in its countries, and how often, an animal was recorded (see below) |
+| [Natural Earth](https://www.naturalearthdata.com) (public domain) | Country outlines (50m, plus 10m when zoomed in), 4,600 states and provinces, 7,300 cities, lakes, rivers | **The base map**: borders, names and places under the animals (see below) |
 | [Paleobiology Database](https://paleobiodb.org) | Fossil finds with country, coordinates and age | **Extends** an extinct species' Ice Age range where ≥2 well-dated finds exist, cross-checks curated extinction dates, and draws the Ice Age map |
 | [PhyloPic](https://www.phylopic.org) | Silhouettes | Self-hosted; only CC0, public-domain and CC BY images; falls back to a close relative (genus, then family) and says so |
 | Wikipedia | Article links | Verified to resolve to a real article |
+
+### The base map
+
+`npm run data` also fetches Natural Earth's 10m states and provinces, populated places, lakes and rivers
+and writes thinned copies to `src/data/generated/basemap/` (about 1.5 MB gzipped in all): lines are
+simplified to roughly 2 km, coordinates rounded to about 400 m, polygons wound the way d3 wants them.
+The app loads them after the map appears. Country outlines come from `world-atlas`: 50m always, and the
+5x finer 10m (3.6 MB) the first time someone zooms in past about 3.5×, built in short slices so the page
+stays responsive. Labels are placed most-important-first (country capitals, then by population) and
+skipped where they would overlap, and a state is only named when its name fits inside it.
 
 ### How the map colours are made
 

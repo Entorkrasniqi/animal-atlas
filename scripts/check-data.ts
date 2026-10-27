@@ -101,6 +101,30 @@ if (existsSync(rangesDir)) {
   }
 }
 
+// --- base map: states, cities, lakes, rivers -----------------------------------------------
+const basemapDir = path.resolve('src/data/generated/basemap');
+for (const name of ['admin1', 'water', 'places']) {
+  if (!existsSync(path.join(basemapDir, `${name}.json`))) err(`basemap/${name}.json`, 'missing (run `npm run data`)');
+}
+if (existsSync(path.join(basemapDir, 'places.json'))) {
+  const places = JSON.parse(readFileSync(path.join(basemapDir, 'places.json'), 'utf8')) as [number, number, string, number, number, number, string][];
+  if (places.length < 5000) err('basemap/places.json', `only ${places.length} places`);
+  for (const [lon, lat, name, , , capital, code] of places) {
+    if (!(Math.abs(lon) <= 180 && Math.abs(lat) <= 90)) err('basemap/places.json', `${name} is off the globe`);
+    if (capital !== 0 && capital !== 1 && capital !== 2) err('basemap/places.json', `${name} has capital flag ${capital}`);
+    if (!code) err('basemap/places.json', `${name} has no country`);
+  }
+}
+for (const name of ['admin1', 'water']) {
+  const file = path.join(basemapDir, `${name}.json`);
+  if (!existsSync(file)) continue;
+  const topo = JSON.parse(readFileSync(file, 'utf8')) as { type: string; transform?: unknown; arcs: unknown[]; objects: Record<string, { geometries: unknown[] }> };
+  if (topo.type !== 'Topology' || !topo.transform) err(`basemap/${name}.json`, 'not a quantized topology');
+  for (const [key, object] of Object.entries(topo.objects)) {
+    if (object.geometries.length === 0) err(`basemap/${name}.json`, `object "${key}" is empty`);
+  }
+}
+
 const extinct = animals.filter((a) => a.extinctYear !== undefined).length;
 const withSilhouette = animals.filter((a) => a.silhouette).length;
 console.log(

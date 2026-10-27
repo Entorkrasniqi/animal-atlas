@@ -177,7 +177,7 @@
     line-height: 1.1;
   }
   .brand h1 :global(svg) {
-    color: var(--accent);
+    color: var(--ink);
   }
   .brand p {
     margin: 8px 0 0;

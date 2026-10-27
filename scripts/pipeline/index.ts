@@ -7,12 +7,14 @@
  *
  * Input:  data/curated/*            the editorial layer (facts no open API provides)
  * Output: src/data/generated/animals.json   what the app imports
+ *         src/data/generated/basemap/*.json   Natural Earth states, cities, lakes, rivers (thinned)
  *         public/silhouettes/*.svg + CREDITS.md   self-hosted PhyloPic images
  *         data/generated/report.md  what was changed or needs a human look
  */
 import { mkdir, readdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { seeds } from '../../data/curated';
+import { buildBasemap } from './basemap';
 import { buildAnimal, type Built, type Flag, type FlagKind } from './build';
 import { mapLimit, setRefresh } from './http';
 import type { RangeData } from '../../src/lib/types';
@@ -75,6 +77,9 @@ await mkdir(path.dirname(OUT_JSON), { recursive: true });
 const generatedAt = new Date().toISOString().slice(0, 10);
 await writeFile(OUT_JSON, JSON.stringify({ generatedAt, animals }, null, 1) + '\n');
 
+// --- base map: state borders, cities, lakes and rivers (Natural Earth) ------------------
+const basemap = await buildBasemap();
+
 // --- range layers: one file per animal, loaded when it is selected -----------------
 await mkdir(OUT_RANGES, { recursive: true });
 for (const b of built) {
@@ -133,4 +138,5 @@ await mkdir(path.dirname(OUT_REPORT), { recursive: true });
 await writeFile(OUT_REPORT, report);
 
 console.log(`Wrote ${animals.length} animals, ${images.size} silhouettes, ${flags.length} review notes.`);
+console.log(`Base map: ${basemap.admin1} regions, ${basemap.places} places, ${basemap.lakes} lakes, ${basemap.rivers} rivers.`);
 console.log(`  ${path.relative('.', OUT_JSON)}\n  ${path.relative('.', OUT_REPORT)}`);

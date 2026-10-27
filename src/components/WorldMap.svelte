@@ -3,8 +3,10 @@
   import { interpolateZoom } from 'd3-interpolate';
   import { select } from 'd3-selection';
   import { zoom, zoomIdentity, type ZoomBehavior, type ZoomTransform } from 'd3-zoom';
-  import { buildWorld, loadCountries, unionPath, type Shape, type World } from '../lib/geo';
+  import { buildDetailWorld, buildWorld, loadCountries, loadCountriesDetail, unionPath, type Shape, type World } from '../lib/geo';
+  import { buildBasemap, loadBasemap, regionAt, type Basemap, type Hover } from '../lib/basemap';
   import { ESTIMATE_COLOR, MIN_VISIBLE, densityAt, densityBounds, renderField, type HeatTexture, type RangeView } from '../lib/heat';
+  import { drawLabels, webZoom, type DrawnPlace } from '../lib/labels';
   import Icon from './Icon.svelte';
 
   interface Props {
@@ -14,8 +16,8 @@
     heat: Map<string, number> | null;
     /** Country the sidebar is filtered to. */
     focus: string | null;
-    /** Extra tooltip lines for a hovered spot. */
-    label: (code: string | null, lon: number, lat: number) => string[];
+    /** The tooltip for a hovered spot: a heading and extra lines. */
+    label: (hover: Hover) => { title: string; lines: string[] };
     onpick: (code: string | null) => void;
     /** Countries framed when the range has no sighting data. */
     fitCodes: string[];
@@ -32,8 +34,14 @@
   let size = $state({ w: 0, h: 0 });
   let collection = $state.raw<Awaited<ReturnType<typeof loadCountries>> | null>(null);
   let world = $state.raw<World | null>(null);
+  /** The 10m outlines, once someone has zoomed in far enough to want them. */
+  let detail = $state.raw<World | null>(null);
+  let wantDetail = $state(false);
   let loadFailed = $state(false);
-  let tip = $state<{ x: number; y: number; shape: Shape | null; lon: number; lat: number } | null>(null);
+  let tip = $state<{ x: number; y: number; hover: Hover } | null>(null);
+  let basemap = $state.raw<Basemap | null>(null);
+  /** City dots drawn in the last frame, in screen pixels. */
+  let dots: DrawnPlace[] = [];
 
   let transform: ZoomTransform = zoomIdentity;
   let tween = 0;
@@ -42,6 +50,8 @@
   let frame = 0;
 
   const TINY_PX = 7;
+  /** From this zoom the finer coastlines and borders replace the 50m ones. */
+  const DETAIL_K = 3.5;
 
   // --- data + sizing --------------------------------------------------------
 
@@ -85,6 +95,48 @@
     flownTo = undefined; // re-frame the current animal in the new size
   });
 
+  // The finer outlines are built once, the first time the map is zoomed in, and again if the map is resized.
+  $effect(() => {
+    const w = world;
+    if (!w || !wantDetail) return;
+    let current = true;
+    loadCountriesDetail()
+      .then((c) => buildDetailWorld(c, w, () => current))
+      .then(
+        (d) => {
+          if (current && d) {
+            detail = d;
+            scheduleDraw();
+          }
+        },
+        () => {}, // the 50m outlines still work
+      );
+    return () => {
+      current = false;
+      detail = null;
+    };
+  });
+
+  // State borders, cities and rivers are a few MB, so they load once the map is up and are projected
+  // again whenever its size changes.
+  $effect(() => {
+    const w = world;
+    if (!w) return;
+    let stale = false;
+    const timer = window.setTimeout(() => {
+      loadBasemap().then(
+        (raw) => {
+          if (!stale) basemap = buildBasemap(raw, w.projection);
+        },
+        () => {}, // the map works without the extra detail
+      );
+    }, 300);
+    return () => {
+      stale = true;
+      clearTimeout(timer);
+    };
+  });
+
   $effect(() => {
     if (!canvas) return;
     zoomBehavior = zoom<HTMLCanvasElement, unknown>()
@@ -92,6 +144,7 @@
       .on('zoom', (event) => {
         transform = event.transform;
         tip = null;
+        if (transform.k >= DETAIL_K) wantDetail = true;
         scheduleDraw();
         scheduleRaster(RASTER_DELAY);
       });
@@ -111,6 +164,8 @@
     grid: string;
     halo: string;
     ink: string;
+    muted: string;
+    family: string;
   }
   let palette: Palette | null = null;
 
@@ -125,6 +180,8 @@
       grid: get('--map-grid'),
       halo: get('--panel'),
       ink: get('--ink'),
+      muted: get('--muted'),
+      family: get('--sans'),
     };
   }
 
@@ -209,6 +266,11 @@
   );
   /** Periods with no sightings at all show just the countries. */
   const areaPath = $derived<Path2D | null>(world && range?.basis === 'countries' ? unionPath(world, range.countries) : null);
+  // The same two for the finer outlines, which take over when zoomed in.
+  const clipFine = $derived<Path2D | null>(
+    detail && range?.habitat === 'land' && range.clip ? unionPath(detail, range.countries) : null,
+  );
+  const areaFine = $derived<Path2D | null>(detail && range?.basis === 'countries' ? unionPath(detail, range.countries) : null);
 
   // --- drawing --------------------------------------------------------------
 
@@ -222,7 +284,7 @@
 
   $effect(() => {
     // Track everything the picture depends on.
-    void [range, clip, areaPath, heat, focus, world];
+    void [range, clip, areaPath, clipFine, areaFine, detail, heat, focus, world, basemap];
     scheduleDraw();
   });
 
@@ -258,11 +320,22 @@
     ctx.strokeStyle = p.grid;
     ctx.stroke(world.graticule);
 
+    // Zoomed in, the finer outlines (once built) take over from the 50m ones.
+    const fine = detail && k >= DETAIL_K ? detail : null;
+    const base = fine ?? world;
+    // The map's reach in unzoomed units, to skip whatever is off screen.
+    const vx0 = -x / k;
+    const vy0 = -y / k;
+    const vx1 = (size.w - x) / k;
+    const vy1 = (size.h - y) / k;
+    const visible = (s: Shape) => s.bounds[2] >= vx0 && s.bounds[0] <= vx1 && s.bounds[3] >= vy0 && s.bounds[1] <= vy1;
+
     // Animals of the open sea are painted on the water, before the land is drawn over any stray record.
     if (heatTex && range?.habitat === 'sea') drawTexture(ctx, heatTex);
 
     const markers: { s: Shape; color: string }[] = [];
-    for (const s of world.shapes) {
+    for (const s of base.shapes) {
+      if (fine && !visible(s)) continue;
       let fill = p.land;
       const t = s.code && heat ? heat.get(s.code) : undefined;
       if (t !== undefined) fill = mix(p.land, p.present, 0.22 + 0.78 * t);
@@ -271,25 +344,60 @@
       if (fill !== p.land && isTiny(s, k) && s.code && world.byCode.get(s.code) === s) markers.push({ s, color: fill });
     }
 
-    if (areaPath) {
+    const wz = webZoom(world, k);
+    const bm = basemap;
+    if (bm) {
+      ctx.fillStyle = p.ocean;
+      for (const tier of bm.lakes) if (wz + 1 >= tier.zoom) ctx.fill(tier.path);
+    }
+
+    const areaNow = fine && areaFine ? areaFine : areaPath;
+    const clipNow = fine && clipFine ? clipFine : clip;
+    if (areaNow) {
       // Nothing recorded for this period: only the countries are known, so say so plainly.
       ctx.save();
       ctx.globalAlpha = 0.5;
       ctx.fillStyle = ESTIMATE_COLOR;
-      ctx.fill(areaPath);
+      ctx.fill(areaNow);
       ctx.restore();
     }
     if (heatTex && range && range.habitat !== 'sea') {
       ctx.save();
       // Land animals stop at the coast and at the borders of the countries they are known from.
-      if (clip) ctx.clip(clip);
+      if (clipNow) ctx.clip(clipNow);
       drawTexture(ctx, heatTex);
       ctx.restore();
     }
 
+    if (bm) {
+      // Rivers and lake shores over the colour, light enough that the colour still shows through.
+      ctx.strokeStyle = mix(p.ocean, p.ink, 0.2);
+      ctx.lineWidth = 0.9 / k;
+      for (const tier of bm.rivers) if (wz + 1 >= tier.zoom) ctx.stroke(tier.path);
+      ctx.lineWidth = 0.6 / k;
+      for (const tier of bm.lakes) if (wz + 1 >= tier.zoom) ctx.stroke(tier.path);
+    }
+
     ctx.lineWidth = 0.6 / k;
     ctx.strokeStyle = p.border;
-    ctx.stroke(world.borders);
+    if (fine) {
+      // The fine outlines are heavy; stroke only the countries in view.
+      for (const s of fine.shapes) if (visible(s)) ctx.stroke(s.path);
+    } else ctx.stroke(world.borders);
+
+    if (bm && wz > 2.6) {
+      // State and province borders: fainter than countries, and only for countries in view.
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, (wz - 2.6) / 1.2) * 0.75;
+      ctx.lineWidth = 0.5 / k;
+      ctx.setLineDash([2.5 / k, 2 / k]);
+      for (const b of bm.borders) {
+        const [bx0, by0, bx1, by1] = b.bounds;
+        if (bx1 < vx0 || bx0 > vx1 || by1 < vy0 || by0 > vy1) continue;
+        ctx.stroke(b.path);
+      }
+      ctx.restore();
+    }
 
     // Small countries and islands would be invisible in the overview; give them a dot.
     for (const { s, color } of markers) {
@@ -303,7 +411,7 @@
     }
 
     if (focus) {
-      const s = world.byCode.get(focus);
+      const s = base.byCode.get(focus);
       if (s) {
         ctx.lineWidth = 4 / k;
         ctx.strokeStyle = p.halo;
@@ -313,6 +421,19 @@
         ctx.stroke(s.path);
       }
     }
+
+    // Names last, in screen pixels.
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    dots = drawLabels(ctx, {
+      world,
+      basemap: bm,
+      tx: x,
+      ty: y,
+      k,
+      w: size.w,
+      h: size.h,
+      style: { ink: p.ink, muted: p.muted, halo: p.halo, family: p.family },
+    });
   }
 
   // --- interaction ----------------------------------------------------------
@@ -328,7 +449,8 @@
     const py = (my - y) / k;
     const pad = 5 / k;
     let best: Shape | null = null;
-    for (const s of world.shapes) {
+    const base = detail && transform.k >= DETAIL_K ? detail : world;
+    for (const s of base.shapes) {
       const [x0, y0, x1, y1] = s.bounds;
       if (px < x0 - pad || px > x1 + pad || py < y0 - pad || py > y1 + pad) continue;
       const hit = isTiny(s, k)
@@ -346,10 +468,26 @@
     const my = e.clientY - r.top;
     const shape = pick(mx, my);
     const at = world?.projection.invert?.([(mx - transform.x) / transform.k, (my - transform.y) / transform.k]);
+    // A city dot wins over the country under it.
+    const dot = dots.find((d) => Math.hypot(d.x - mx, d.y - my) <= 8) ?? null;
     // Open water has no name, but a sea animal's range still deserves a tooltip there.
     const overRange =
       !shape && at && range?.habitat !== 'land' && range?.density && densityAt(range.density, at[0], at[1]) >= MIN_VISIBLE;
-    tip = at && (shape || overRange) ? { x: mx, y: my, shape, lon: at[0], lat: at[1] } : null;
+    if (at && (shape || overRange || dot)) {
+      const region = basemap && shape && webZoom(world as World, transform.k) > 2.4 ? regionAt(basemap, at[0], at[1]) : null;
+      tip = {
+        x: mx,
+        y: my,
+        hover: {
+          code: shape?.code ?? dot?.place.code ?? null,
+          country: shape?.name ?? null,
+          region: region?.name ?? null,
+          place: dot?.place ?? null,
+          lon: at[0],
+          lat: at[1],
+        },
+      };
+    } else tip = null;
     (canvas as HTMLCanvasElement).style.cursor = shape?.code ? 'pointer' : 'grab';
   }
 
@@ -425,7 +563,7 @@
     untrack(() => flyTo(key ? viewForRange() : zoomIdentity));
   });
 
-  const tipLines = $derived(tip ? label(tip.shape?.code ?? null, tip.lon, tip.lat) : []);
+  const tipText = $derived(tip ? label(tip.hover) : null);
 </script>
 
 <div class="map" bind:this={host}>
@@ -461,8 +599,8 @@
       class:up={tip.y > size.h - 110}
       style="left:{tip.x}px;top:{tip.y}px"
     >
-      <strong>{tip.shape?.name ?? 'Open water'}</strong>
-      {#each tipLines as line}
+      <strong>{tipText?.title}</strong>
+      {#each tipText?.lines ?? [] as line}
         <span>{line}</span>
       {/each}
     </div>

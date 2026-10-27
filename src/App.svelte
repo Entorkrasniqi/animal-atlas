@@ -7,6 +7,7 @@
   import WorldMap from './components/WorldMap.svelte';
   import DetailPanel from './components/DetailPanel.svelte';
   import Logo from './components/Logo.svelte';
+  import type { Hover } from './lib/basemap';
   import { countryName } from './lib/geo';
   import { MIN_VISIBLE, commonness, densityAt, makeDensity, rampGradient, type Density, type RangeView } from './lib/heat';
   import { animalsIn, countByCountry, isExtinctAt, rangeAt, stageIndexAt } from './lib/state';
@@ -176,7 +177,7 @@
     });
   });
 
-  function mapLabel(code: string | null, lon: number, lat: number): string[] {
+  function animalLines(code: string | null, lon: number, lat: number): string[] {
     const click = code ? ['Click to list animals here'] : [];
     if (selected && rangeView) {
       const gone = rangeView.extinct;
@@ -195,6 +196,16 @@
     if (here.length === 0) return ['No atlas animals recorded here'];
     const names = here.slice(0, 5).map((a) => a.name).join(', ') + (here.length > 5 ? '…' : '');
     return [`${here.length} atlas ${here.length === 1 ? 'animal' : 'animals'} alive in ${formatYear(year)}`, names];
+  }
+
+  /** The tooltip: what is there (city, state, country), then what the selected animal makes of it. */
+  function mapLabel(h: Hover): { title: string; lines: string[] } {
+    const where = [h.region, h.country].filter(Boolean).join(', ');
+    const title = h.place?.name ?? (where || 'Open water');
+    const about = h.place
+      ? [`${countryName(h.place.code)}${h.place.pop >= 1 ? ` · ${formatCount(h.place.pop * 1000)} people` : ''}`]
+      : [];
+    return { title, lines: [...about, ...animalLines(h.code, h.lon, h.lat)] };
   }
 
   function pickExtinct(a: Animal) {
