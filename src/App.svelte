@@ -1,15 +1,18 @@
 <script lang="ts">
   import { untrack } from 'svelte';
   import { animalById, animals } from './data';
+  import { loadRange } from './data/ranges';
   import Sidebar from './components/Sidebar.svelte';
   import Timeline from './components/Timeline.svelte';
   import WorldMap from './components/WorldMap.svelte';
   import DetailPanel from './components/DetailPanel.svelte';
   import Logo from './components/Logo.svelte';
+  import type { Hover } from './lib/basemap';
   import { countryName } from './lib/geo';
-  import { animalsIn, countByCountry, isExtinctAt, rangeAt } from './lib/state';
-  import { MAX_YEAR, MIN_YEAR, clampYear, formatYear, posToYear, yearToPos } from './lib/time';
-  import { GROUP_LABEL, type Animal, type Group, type StateFilter } from './lib/types';
+  import { MIN_VISIBLE, commonness, densityAt, makeDensity, rampGradient, type Density, type RangeView } from './lib/heat';
+  import { animalsIn, countByCountry, isExtinctAt, rangeAt, stageIndexAt } from './lib/state';
+  import { MAX_YEAR, MIN_YEAR, clampYear, formatCount, formatYear, posToYear, yearToPos } from './lib/time';
+  import { GROUP_LABEL, type Animal, type Group, type RangeData, type RangeLayer, type StateFilter } from './lib/types';
 
   const PLAY_SECONDS = 40;
   const extinctAnimals = animals.filter((a) => a.extinctYear !== undefined);
@@ -94,13 +97,58 @@
   // --- derived state ----------------------------------------------------------
   const selected = $derived<Animal | null>(selectedId ? (animalById.get(selectedId) ?? null) : null);
 
-  const present = $derived<Set<string>>(
-    selected && !isExtinctAt(selected, year) ? new Set(rangeAt(selected, year)) : new Set(),
-  );
-  const former = $derived<Set<string>>(
-    selected && isExtinctAt(selected, year) ? new Set(rangeAt(selected, year)) : new Set(),
-  );
   const fitCodes = $derived(selected ? rangeAt(selected, year) : []);
+
+  // Where in those countries the animal is recorded: one file per animal, loaded when it is selected.
+  let loaded = $state.raw<{ id: string; data: RangeData | null } | null>(null);
+  $effect(() => {
+    const id = selectedId;
+    if (!id) return;
+    let stale = false;
+    loadRange(id).then((data) => {
+      if (!stale) loaded = { id, data };
+    });
+    return () => {
+      stale = true;
+    };
+  });
+  const rangeReady = $derived(!selected || loaded?.id === selected.id);
+
+  // Primitives, so the map only repaints its range when the stage (not every year) changes.
+  const stageIndex = $derived(selected ? stageIndexAt(selected, year) : -1);
+  const extinctNow = $derived(selected ? isExtinctAt(selected, year) : false);
+  const layer = $derived<RangeLayer | null>(
+    selected && loaded?.id === selected.id ? (loaded.data?.layers[stageIndex] ?? null) : null,
+  );
+
+  const densities = new WeakMap<RangeLayer, Density | null>();
+  function densityOf(l: RangeLayer): Density | null {
+    if (!densities.has(l)) densities.set(l, makeDensity(l));
+    return densities.get(l) ?? null;
+  }
+
+  const rangeView = $derived.by<RangeView | null>(() => {
+    // Draw nothing until the file arrives, rather than flashing the countries first.
+    if (!selected || !rangeReady) return null;
+    return {
+      density: layer ? densityOf(layer) : null,
+      basis: layer?.basis ?? 'countries',
+      habitat: selected.habitat ?? 'land',
+      countries: selected.range[stageIndex].countries,
+      clip: layer?.clip !== false,
+      extinct: extinctNow,
+    };
+  });
+  const rangeNote = $derived(
+    layer
+      ? {
+          source: `${layer.source}${layer.records >= 1 ? ` (${formatCount(layer.records)} records)` : ''}`,
+          heat: layer.basis === 'records' || layer.basis === 'all-time',
+        }
+      : null,
+  );
+  /** Whether the colour ramp means anything for this period (hand-drawn areas and country outlines don't). */
+  const hasSightings = $derived(!!rangeView?.density && !rangeView.density.uniform);
 
   /** Overview mode: how many atlas animals live in each country. */
   const heat = $derived.by<Map<string, number> | null>(() => {
@@ -129,17 +177,35 @@
     });
   });
 
-  function mapLabel(code: string | null): string[] {
-    if (!code) return ['Territory not in the atlas data'];
-    if (selected) {
-      if (present.has(code)) return [`${selected.name} lives here in ${formatYear(year)}`, 'Click to list animals here'];
-      if (former.has(code)) return [`Former range of ${selected.name}`, 'Click to list animals here'];
-      return [`${selected.name}: no record here`, 'Click to list animals here'];
+  function animalLines(code: string | null, lon: number, lat: number): string[] {
+    const click = code ? ['Click to list animals here'] : [];
+    if (selected && rangeView) {
+      const gone = rangeView.extinct;
+      if (hasSightings && rangeView.density) {
+        const v = densityAt(rangeView.density, lon, lat);
+        const level = commonness(v);
+        const lines = v < MIN_VISIBLE ? [`No ${selected.name} sightings recorded nearby`] : [gone ? `Was ${level.toLowerCase()}` : level];
+        return [...lines, ...click];
+      }
+      if (rangeView.density?.uniform) return [`${gone ? 'Last known' : 'Approximate'} area of ${selected.name}`, 'No sighting data to say how common', ...click];
+      if (code && rangeView.countries.includes(code)) return [`${gone ? 'Last known range' : 'Range'} of ${selected.name}`, 'Country level only: no sighting data', ...click];
+      return [`${selected.name}: no record here`, ...click];
     }
+    if (!code) return ['Territory not in the atlas data'];
     const here = animalsIn(animals, code, year);
     if (here.length === 0) return ['No atlas animals recorded here'];
     const names = here.slice(0, 5).map((a) => a.name).join(', ') + (here.length > 5 ? '…' : '');
     return [`${here.length} atlas ${here.length === 1 ? 'animal' : 'animals'} alive in ${formatYear(year)}`, names];
+  }
+
+  /** The tooltip: what is there (city, state, country), then what the selected animal makes of it. */
+  function mapLabel(h: Hover): { title: string; lines: string[] } {
+    const where = [h.region, h.country].filter(Boolean).join(', ');
+    const title = h.place?.name ?? (where || 'Open water');
+    const about = h.place
+      ? [`${countryName(h.place.code)}${h.place.pop >= 1 ? ` · ${formatCount(h.place.pop * 1000)} people` : ''}`]
+      : [];
+    return { title, lines: [...about, ...animalLines(h.code, h.lon, h.lat)] };
   }
 
   function pickExtinct(a: Animal) {
@@ -171,16 +237,21 @@
   </div>
 
   <main class="stage">
-    <WorldMap {present} {former} {heat} focus={country} label={mapLabel} onpick={pickCountry} {fitCodes} fitKey={selectedId} />
+    <WorldMap range={rangeView} {heat} focus={country} label={mapLabel} onpick={pickCountry} {fitCodes} fitKey={selectedId} fitReady={rangeReady} />
 
     <div class="legend" aria-hidden="true">
       {#if selected}
-        {#if isExtinctAt(selected, year)}
-          <span><i class="sw hatch"></i>Former range</span>
+        {#if !rangeReady}
+          <span>Loading range…</span>
+        {:else if hasSightings}
+          <span class="key">
+            {extinctNow ? 'Last known range' : 'Recorded sightings'}
+            <span>Rare</span><i class="ramp" style:background={rampGradient(extinctNow ? 'extinct' : 'living')}></i><span>Very common</span>
+          </span>
         {:else}
-          <span><i class="sw on"></i>Lives here</span>
+          <span><i class="sw est"></i>{extinctNow ? 'Last known range' : 'Range'} (approximate, no sighting data)</span>
         {/if}
-        <span><i class="sw off"></i>No record</span>
+        <span><i class="sw off"></i>No records</span>
       {:else}
         <span>Fewer animals</span><i class="ramp"></i><span>More</span>
       {/if}
@@ -202,6 +273,7 @@
         onclose={() => (selectedId = null)}
         onjump={(y) => (year = y)}
         onpickcountry={pickCountry}
+        {rangeNote}
       />
     </div>
   {/if}
@@ -263,8 +335,11 @@
     left: 16px;
     bottom: 16px;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 14px;
+    gap: 6px 14px;
+    /* Leave room for the zoom buttons at the right edge. */
+    max-width: calc(100% - 82px);
     padding: 8px 12px;
     border: 1px solid var(--line-strong);
     border-radius: var(--radius);
@@ -283,16 +358,21 @@
     border-radius: 2px;
     border: 1px solid var(--map-border);
   }
-  .sw.on {
-    background: var(--map-present);
-    border-color: var(--map-present);
+  .sw.est {
+    background: color-mix(in srgb, #8c93a8 50%, var(--map-land));
+    border-color: #8c93a8;
   }
   .sw.off {
     background: var(--map-land);
   }
-  .sw.hatch {
-    background: repeating-linear-gradient(135deg, var(--map-land) 0 3px, var(--map-extinct) 3px 4px);
-    border-color: var(--map-extinct);
+  .key {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 7px;
+  }
+  .key > :first-child {
+    margin-right: 4px;
   }
   .ramp {
     width: 90px;

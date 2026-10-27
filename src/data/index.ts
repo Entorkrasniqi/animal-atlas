@@ -1,15 +1,10 @@
 import type { Animal } from '../lib/types';
-import { extinctBirds, livingBirds } from './birds';
-import { extinctMammals, livingMammals } from './mammals';
-import { extinctOthers, livingOthers } from './other';
+import raw from './generated/animals.json';
 
-export const animals: Animal[] = [
-  ...livingMammals,
-  ...extinctMammals,
-  ...livingBirds,
-  ...extinctBirds,
-  ...livingOthers,
-  ...extinctOthers,
-].sort((a, b) => a.name.localeCompare(b.name));
+/** Written by `npm run data` from the curated entries plus GBIF, PBDB and PhyloPic. */
+export const animals: Animal[] = [...(raw.animals as unknown as Animal[])].sort((a, b) => a.name.localeCompare(b.name));
 
 export const animalById = new Map(animals.map((a) => [a.id, a]));
+
+/** When the pipeline last ran (YYYY-MM-DD). */
+export const dataDate: string = raw.generatedAt;

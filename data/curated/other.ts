@@ -19,6 +19,7 @@ export const livingOthers = [
     name: 'Leatherback sea turtle',
     sci: 'Dermochelys coriacea',
     group: 'reptile',
+    habitat: 'sea',
     status: 'VU',
     about:
       'The biggest turtle, diving over 1,000 m and crossing entire oceans. Pacific nesting populations have fallen by more than 90%. Countries listed are those with nesting beaches.',
@@ -36,6 +37,7 @@ export const livingOthers = [
     id: 'galapagos-tortoise',
     name: 'Galápagos giant tortoise',
     sci: 'Chelonoidis niger complex',
+    hints: { gbif: 'Chelonoidis', wikipedia: 'Galápagos tortoise' }, // a group of species; 'C. niger' is the extinct Floreana tortoise
     group: 'reptile',
     status: 'VU',
     about:
@@ -133,6 +135,7 @@ export const livingOthers = [
     name: 'Great white shark',
     sci: 'Carcharodon carcharias',
     group: 'fish',
+    habitat: 'sea',
     status: 'VU',
     about:
       'The largest predatory fish. Slow to mature and slow to breed, it cannot withstand heavy fishing pressure. Countries listed are those whose coastal waters it visits.',
@@ -149,6 +152,7 @@ export const livingOthers = [
     name: 'Whale shark',
     sci: 'Rhincodon typus',
     group: 'fish',
+    habitat: 'sea',
     status: 'EN',
     about:
       'The biggest fish alive — up to 18 m — a gentle filter feeder. Its Indo-Pacific numbers have fallen by an estimated 63% over 75 years.',
@@ -156,7 +160,7 @@ export const livingOthers = [
     range: [
       [
         S,
-        'MEX USA BLZ HND BRA CUB AUS IDN PHL THA IND LKA MDV MOZ TZA KEN MDG SOM OMN YEM DJI ERI EGY SAU JPN TWN CHN',
+        'MEX USA BLZ HND BRA CUB ECU PER CRI AUS IDN PHL THA IND LKA MDV MOZ TZA KEN MDG SOM OMN YEM DJI ERI EGY SAU JPN TWN CHN',
       ],
     ],
   }),
@@ -165,6 +169,7 @@ export const livingOthers = [
     name: 'Coelacanth',
     sci: 'Latimeria chalumnae',
     group: 'fish',
+    habitat: 'sea',
     status: 'CR',
     about:
       'Known only from fossils and presumed extinct for ~66 million years — until a living one was caught off South Africa in 1938.',
@@ -177,6 +182,7 @@ export const livingOthers = [
     name: 'Beluga sturgeon',
     sci: 'Huso huso',
     group: 'fish',
+    habitat: 'coast',
     status: 'CR',
     about:
       'Source of the finest caviar, it can live over 100 years and reach 6 m. Dams block its spawning migrations and poaching continues.',
@@ -191,6 +197,7 @@ export const livingOthers = [
     name: 'Atlantic bluefin tuna',
     sci: 'Thunnus thynnus',
     group: 'fish',
+    habitat: 'sea',
     status: 'LC',
     about:
       'A warm-blooded, 3-metre ocean sprinter. Overfishing drove the spawning stock down by about 80%; tight quotas since 2010 have let it rebound.',
@@ -198,7 +205,7 @@ export const livingOthers = [
     range: [
       [
         S,
-        'USA CAN MEX BRA ISL NOR GBR IRL FRA ESP PRT ITA MLT GRC TUR TUN LBY EGY MAR DZA HRV JPN',
+        'USA CAN MEX BRA ISL NOR SWE GBR IRL FRA ESP PRT ITA MLT GRC TUR TUN LBY EGY MAR DZA HRV JPN',
       ],
     ],
   }),

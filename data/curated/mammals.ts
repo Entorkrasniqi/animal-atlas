@@ -189,7 +189,7 @@ export const livingMammals = [
       [S, 'ZAF NAM BWA ZWE MOZ SWZ ZMB AGO'],
       [1895, 'ZAF'],
       [1960, 'ZAF SWZ NAM BWA ZWE'],
-      [2000, 'ZAF SWZ NAM BWA ZWE KEN ZMB MOZ'],
+      [2000, 'ZAF SWZ NAM BWA ZWE KEN ZMB MOZ UGA'],
     ],
     pop: [
       [1895, 100],
@@ -429,6 +429,7 @@ export const livingMammals = [
     name: 'Polar bear',
     sci: 'Ursus maritimus',
     group: 'mammal',
+    habitat: 'coast',
     status: 'VU',
     about:
       'Depends on sea ice to hunt seals. Arctic sea ice is shrinking about 13% per decade, shortening the hunting season.',
@@ -551,6 +552,7 @@ export const livingMammals = [
     name: 'Vaquita',
     sci: 'Phocoena sinus',
     group: 'mammal',
+    habitat: 'sea',
     status: 'CR',
     about:
       'The world’s rarest marine mammal, found only in the northern Gulf of California. Illegal gillnets set for totoaba kill the last few.',
@@ -570,6 +572,7 @@ export const livingMammals = [
     name: 'Blue whale',
     sci: 'Balaenoptera musculus',
     group: 'mammal',
+    habitat: 'sea',
     status: 'EN',
     about:
       'The largest animal that has ever lived. Industrial whaling killed ~360,000 in the 20th century; they are recovering slowly. Countries listed are those whose waters they visit.',
@@ -577,7 +580,7 @@ export const livingMammals = [
     range: [
       [
         S,
-        'USA MEX CAN CHL PER ECU COL CRI PAN AUS NZL ZAF NAM MOZ MDG IND LKA IDN JPN RUS CHN KOR ISL NOR GRL BRA ARG URY ATA',
+        'USA MEX CAN CHL PER ECU COL CRI PAN AUS NZL ZAF NAM MOZ MDG IND LKA IDN JPN RUS CHN KOR ISL NOR GRL BRA ARG URY PRT ATA',
       ],
     ],
     pop: [
@@ -590,6 +593,7 @@ export const livingMammals = [
     name: 'Humpback whale',
     sci: 'Megaptera novaeangliae',
     group: 'mammal',
+    habitat: 'sea',
     status: 'LC',
     about:
       'Famous for haunting songs and breaching. Hunted to around 5,000 animals by the 1960s, many populations have rebounded since the whaling ban.',
@@ -611,6 +615,7 @@ export const livingMammals = [
     name: 'Sea otter',
     sci: 'Enhydra lutris',
     group: 'mammal',
+    habitat: 'coast',
     status: 'EN',
     about:
       'The densest fur of any animal made it a prize. The fur trade nearly wiped it out by 1911; protection and reintroductions rebuilt a population of ~125,000.',
@@ -772,6 +777,7 @@ export const extinctMammals = [
     name: 'Steller’s sea cow',
     sci: 'Hydrodamalis gigas',
     group: 'mammal',
+    habitat: 'coast',
     status: 'EX',
     extinct: 1768,
     about:
@@ -968,6 +974,7 @@ export const extinctMammals = [
     name: 'Caribbean monk seal',
     sci: 'Neomonachus tropicalis',
     group: 'mammal',
+    habitat: 'coast',
     status: 'EX',
     extinct: 1952,
     about:
@@ -982,7 +989,9 @@ export const extinctMammals = [
     id: 'sea-mink',
     name: 'Sea mink',
     sci: 'Neogale macrodon',
+    hints: { gbif: 'Neovison macrodon' },
     group: 'mammal',
+    habitat: 'coast',
     status: 'EX',
     extinct: 1894,
     about:

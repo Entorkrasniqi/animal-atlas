@@ -11,13 +11,69 @@ export interface RangeStage {
   countries: string[];
 }
 
+/** Where an animal lives, which decides how its range is drawn. */
+export type Habitat = 'land' | 'coast' | 'sea';
+
+/**
+ * How one range stage is drawn on the world grid (see grid.ts). `cells` holds sighting counts, so
+ * the more records near a place, the "more common" the animal is shown to be there.
+ */
+export interface RangeLayer {
+  /**
+   * records  – counted from sightings and fossil finds made in this stage
+   * all-time – too few records in this stage, so every record since 1700 inside its countries
+   * area     – no usable records; a hand-drawn area (a few animals live in one small refuge)
+   * countries – no usable records and no area: only the stage's countries are known
+   */
+  basis: 'records' | 'all-time' | 'area' | 'countries';
+  /** Plain-language description of the evidence, e.g. "GBIF sightings, 1990–2025". */
+  source: string;
+  /** Records behind the layer (fossil finds count by how well their age fits the stage). */
+  records: number;
+  /** Flat [cell, count, cell, count, …] sorted by cell; empty for `countries`. */
+  cells: number[];
+  /** False when the cells lie outside the country outlines (a refuge too small for the map): don't clip them. */
+  clip?: false;
+}
+
+/** One layer per `Animal.range` stage, in the same order. Stored per animal, loaded on demand. */
+export interface RangeData {
+  layers: RangeLayer[];
+}
+
+/** A silhouette from PhyloPic, self-hosted under /silhouettes. */
+export interface Silhouette {
+  /** Public path, e.g. "/silhouettes/tiger.svg". */
+  file: string;
+  /** Contributor to credit (empty for public-domain images). */
+  credit: string;
+  /** Short licence name, e.g. "CC0" or "CC BY 4.0". */
+  license: string;
+  licenseUrl: string;
+  /** The image's page on PhyloPic. */
+  pageUrl: string;
+  /** How closely the image matches: the species itself, or a close relative. */
+  rank: 'species' | 'genus' | 'family' | 'order';
+  /** Name of the taxon the image depicts, e.g. "Panthera tigris" or "Felidae". */
+  taxon: string;
+}
+
+export interface SourceLink {
+  label: string;
+  url: string;
+}
+
 export interface Animal {
   id: string;
   name: string;
   scientific: string;
   group: Group;
-  /** Latest IUCN category. */
+  /** Defaults to land. Sea animals are drawn over open water, coastal ones over shores and shallows. */
+  habitat?: Habitat;
+  /** Conservation category: IUCN's where it assessed this taxon, otherwise curated. */
   status: IucnStatus;
+  /** Where `status` came from. */
+  statusSource?: 'iucn' | 'curated';
   /** Year the species was lost (negative = BCE). Absent for living species. */
   extinctYear?: number;
   about: string;
@@ -29,6 +85,13 @@ export interface Animal {
   population?: [number, number][];
   /** What `population` counts. Defaults to "individuals". */
   popUnit?: string;
+
+  // --- filled in by the data pipeline (see scripts/pipeline) ---
+  silhouette?: Silhouette;
+  /** Where to read more. */
+  sources?: SourceLink[];
+  /** Plain-language notes on how this entry was built and checked. */
+  notes?: string[];
 }
 
 export const GROUP_LABEL: Record<Group, string> = {

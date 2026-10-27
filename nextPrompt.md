@@ -1,0 +1,1 @@
+i want the area of location to be more specific use colder or lighter colors for not so common in a area and darker or hoter colors for to be more common in a area. i dont like that you cover a whole country if an animal exists in one. i want you to be more specific and show where in which land area the animals exists

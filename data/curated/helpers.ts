@@ -1,4 +1,4 @@
-import type { Animal, Group, IucnStatus } from '../lib/types';
+import type { Animal, Group, Habitat, IucnStatus, RangeStage } from '../../src/lib/types';
 
 /** Start of the timeline. Every animal's first range stage begins here. */
 export const S = -50000;
@@ -15,11 +15,35 @@ export const drop = (base: string[], s: string): string[] => {
   return base.filter((x) => !out.has(x));
 };
 
+/** [west, south, east, north] in degrees. West > east means the box crosses the antimeridian. */
+export type Box = [number, number, number, number];
+
+/** A range stage plus, optionally, the small areas it is confined to (see areas.ts). */
+export interface SeedStage extends RangeStage {
+  areas?: Box[];
+}
+
+/** Names to try when a source doesn't know the species by its scientific name. */
+export interface Hints {
+  gbif?: string;
+  pbdb?: string;
+  wikipedia?: string;
+}
+
+/** A curated entry: everything the pipeline can't get from an open API. */
+export interface Seed extends Animal {
+  range: SeedStage[];
+  hints?: Hints;
+}
+
 interface Input {
   id: string;
   name: string;
   sci: string;
   group: Group;
+  /** Defaults to land. */
+  habitat?: Habitat;
+  /** Fallback; replaced by the IUCN category when the pipeline can read one. */
   status: IucnStatus;
   extinct?: number;
   about: string;
@@ -28,14 +52,16 @@ interface Input {
   range: [number, string | string[]][];
   pop?: [number, number][];
   popUnit?: string;
+  hints?: Hints;
 }
 
-export function animal(i: Input): Animal {
+export function animal(i: Input): Seed {
   return {
     id: i.id,
     name: i.name,
     scientific: i.sci,
     group: i.group,
+    habitat: i.habitat,
     status: i.status,
     extinctYear: i.extinct,
     about: i.about,
@@ -46,5 +72,6 @@ export function animal(i: Input): Animal {
     })),
     population: i.pop,
     popUnit: i.popUnit,
+    hints: i.hints,
   };
 }

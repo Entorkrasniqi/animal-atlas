@@ -5,10 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "svelte-check --tsconfig ./tsconfig.json && vite build",
-    "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json",
-    "check:data": "tsx scripts/check-data.ts"
+    "data": "tsx scripts/pipeline/index.ts",
+    "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.node.json",
+    "check:data": "tsx scripts/check-data.ts",
+    "build": "npm run check && npm run check:data && vite build",
+    "build:fresh": "npm run data -- --refresh && npm run build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "d3-geo": "3.1.1",
@@ -20,15 +22,22 @@
     "world-atlas": "2.0.2"
   },
   "devDependencies": {
+    "@mapbox/vector-tile": "^2.0.4",
     "@sveltejs/vite-plugin-svelte": "^7.3.1",
     "@types/d3-geo": "3.1.0",
     "@types/d3-interpolate": "^3.0.4",
     "@types/d3-selection": "3.0.11",
     "@types/d3-zoom": "3.0.8",
     "@types/geojson": "7946.0.14",
+    "@types/node": "^22.20.5",
     "@types/topojson-client": "3.1.5",
+    "@types/topojson-server": "^3.0.4",
+    "@types/topojson-simplify": "^3.0.3",
+    "pbf": "^4.0.1",
     "svelte": "^5.57.2",
     "svelte-check": "^4.7.7",
+    "topojson-server": "^3.0.1",
+    "topojson-simplify": "^3.0.3",
     "tsx": "4.19.2",
     "typescript": "~5.9.3",
     "vite": "^8.3.5"

@@ -3,36 +3,45 @@
   import { interpolateZoom } from 'd3-interpolate';
   import { select } from 'd3-selection';
   import { zoom, zoomIdentity, type ZoomBehavior, type ZoomTransform } from 'd3-zoom';
-  import { buildWorld, loadCountries, type Shape, type World } from '../lib/geo';
+  import { buildDetailWorld, buildWorld, loadCountries, loadCountriesDetail, unionPath, type Shape, type World } from '../lib/geo';
+  import { buildBasemap, loadBasemap, regionAt, type Basemap, type Hover } from '../lib/basemap';
+  import { ESTIMATE_COLOR, MIN_VISIBLE, densityAt, densityBounds, renderField, type HeatTexture, type RangeView } from '../lib/heat';
+  import { drawLabels, webZoom, type DrawnPlace } from '../lib/labels';
   import Icon from './Icon.svelte';
 
   interface Props {
-    /** Countries where the selected animal currently lives. */
-    present: Set<string>;
-    /** Last known range of an extinct animal. */
-    former: Set<string>;
+    /** The selected animal's range, or null in the overview. */
+    range: RangeView | null;
     /** Overview mode: 0..1 intensity per country. */
     heat: Map<string, number> | null;
     /** Country the sidebar is filtered to. */
     focus: string | null;
-    /** Extra tooltip lines for a hovered country. */
-    label: (code: string | null) => string[];
+    /** The tooltip for a hovered spot: a heading and extra lines. */
+    label: (hover: Hover) => { title: string; lines: string[] };
     onpick: (code: string | null) => void;
-    /** Countries the "Zoom to range" button (and fly-to on selection) frames. */
+    /** Countries framed when the range has no sighting data. */
     fitCodes: string[];
-    /** When this changes, the view flies to `fitCodes` (or back to the world if null). */
+    /** When this changes (and `fitReady`), the view flies to the range, or back to the world if null. */
     fitKey: string | null;
+    /** False while the selected animal's range is still loading. */
+    fitReady: boolean;
   }
 
-  let { present, former, heat, focus, label, onpick, fitCodes, fitKey }: Props = $props();
+  let { range, heat, focus, label, onpick, fitCodes, fitKey, fitReady }: Props = $props();
 
   let host = $state<HTMLDivElement>();
   let canvas = $state<HTMLCanvasElement>();
   let size = $state({ w: 0, h: 0 });
   let collection = $state.raw<Awaited<ReturnType<typeof loadCountries>> | null>(null);
   let world = $state.raw<World | null>(null);
+  /** The 10m outlines, once someone has zoomed in far enough to want them. */
+  let detail = $state.raw<World | null>(null);
+  let wantDetail = $state(false);
   let loadFailed = $state(false);
-  let tip = $state<{ x: number; y: number; shape: Shape } | null>(null);
+  let tip = $state<{ x: number; y: number; hover: Hover } | null>(null);
+  let basemap = $state.raw<Basemap | null>(null);
+  /** City dots drawn in the last frame, in screen pixels. */
+  let dots: DrawnPlace[] = [];
 
   let transform: ZoomTransform = zoomIdentity;
   let tween = 0;
@@ -41,6 +50,8 @@
   let frame = 0;
 
   const TINY_PX = 7;
+  /** From this zoom the finer coastlines and borders replace the 50m ones. */
+  const DETAIL_K = 3.5;
 
   // --- data + sizing --------------------------------------------------------
 
@@ -84,6 +95,48 @@
     flownTo = undefined; // re-frame the current animal in the new size
   });
 
+  // The finer outlines are built once, the first time the map is zoomed in, and again if the map is resized.
+  $effect(() => {
+    const w = world;
+    if (!w || !wantDetail) return;
+    let current = true;
+    loadCountriesDetail()
+      .then((c) => buildDetailWorld(c, w, () => current))
+      .then(
+        (d) => {
+          if (current && d) {
+            detail = d;
+            scheduleDraw();
+          }
+        },
+        () => {}, // the 50m outlines still work
+      );
+    return () => {
+      current = false;
+      detail = null;
+    };
+  });
+
+  // State borders, cities and rivers are a few MB, so they load once the map is up and are projected
+  // again whenever its size changes.
+  $effect(() => {
+    const w = world;
+    if (!w) return;
+    let stale = false;
+    const timer = window.setTimeout(() => {
+      loadBasemap().then(
+        (raw) => {
+          if (!stale) basemap = buildBasemap(raw, w.projection);
+        },
+        () => {}, // the map works without the extra detail
+      );
+    }, 300);
+    return () => {
+      stale = true;
+      clearTimeout(timer);
+    };
+  });
+
   $effect(() => {
     if (!canvas) return;
     zoomBehavior = zoom<HTMLCanvasElement, unknown>()
@@ -91,7 +144,9 @@
       .on('zoom', (event) => {
         transform = event.transform;
         tip = null;
+        if (transform.k >= DETAIL_K) wantDetail = true;
         scheduleDraw();
+        scheduleRaster(RASTER_DELAY);
       });
     select(canvas).call(zoomBehavior);
     return () => {
@@ -106,13 +161,13 @@
     land: string;
     border: string;
     present: string;
-    extinct: string;
     grid: string;
     halo: string;
     ink: string;
+    muted: string;
+    family: string;
   }
   let palette: Palette | null = null;
-  let hatch: { pattern: CanvasPattern; dpr: number } | null = null;
 
   function readPalette(): Palette {
     const css = getComputedStyle(host as HTMLElement);
@@ -122,10 +177,11 @@
       land: get('--map-land'),
       border: get('--map-border'),
       present: get('--map-present'),
-      extinct: get('--map-extinct'),
       grid: get('--map-grid'),
       halo: get('--panel'),
       ink: get('--ink'),
+      muted: get('--muted'),
+      family: get('--sans'),
     };
   }
 
@@ -133,7 +189,6 @@
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
     const onChange = () => {
       palette = null;
-      hatch = null;
       scheduleDraw();
     };
     mq.addEventListener('change', onChange);
@@ -153,28 +208,69 @@
     return `rgb(${m(r1, r2)}, ${m(g1, g2)}, ${m(b1, b2)})`;
   }
 
-  function getHatch(ctx: CanvasRenderingContext2D, p: Palette, dpr: number): CanvasPattern {
-    if (hatch && hatch.dpr === dpr) return hatch.pattern;
-    const s = Math.round(7 * dpr);
-    const tile = document.createElement('canvas');
-    tile.width = tile.height = s;
-    const t = tile.getContext('2d') as CanvasRenderingContext2D;
-    t.fillStyle = p.land;
-    t.fillRect(0, 0, s, s);
-    t.strokeStyle = p.extinct;
-    t.lineWidth = 1.3 * dpr;
-    t.beginPath();
-    t.moveTo(-s, s);
-    t.lineTo(s, -s);
-    t.moveTo(0, s * 2);
-    t.lineTo(s * 2, 0);
-    t.moveTo(-s, s * 2);
-    t.lineTo(s * 2, -s);
-    t.stroke();
-    const pattern = ctx.createPattern(tile, 'repeat') as CanvasPattern;
-    hatch = { pattern, dpr };
-    return pattern;
+  // --- the selected animal's range ------------------------------------------
+
+  /** The unzoomed box around where the animal was recorded, for framing it. */
+  const focusBox = $derived.by<[number, number, number, number] | null>(() => {
+    const w = world;
+    const d = range?.density;
+    return w && d ? densityBounds(d, (p) => w.projection(p), 0.15) : null;
+  });
+
+  // The heat is painted per pixel for the current view, so it stays sharp at any zoom. While a pan or
+  // zoom is under way the last painting is just stretched; a fresh one replaces it once the view settles.
+  const RASTER_DELAY = 140;
+  let heatTex: HeatTexture | null = null;
+  let rasterTimer = 0;
+
+  function scheduleRaster(delay: number) {
+    clearTimeout(rasterTimer);
+    rasterTimer = window.setTimeout(paintHeat, delay);
   }
+
+  function paintHeat() {
+    rasterTimer = 0;
+    const w = world;
+    const r = range;
+    if (!w || !r?.density) {
+      heatTex = null;
+      scheduleDraw();
+      return;
+    }
+    const kind = r.density.uniform ? 'estimate' : r.extinct ? 'extinct' : 'living';
+    // The screen plus a margin, so a small pan doesn't show an unpainted edge.
+    const mx = size.w * 0.4;
+    const my = size.h * 0.4;
+    heatTex = renderField(
+      r.density,
+      (p) => w.projection.invert?.(p) ?? null,
+      (p) => w.projection(p),
+      { x: transform.x, y: transform.y, k: transform.k },
+      [-mx, -my, size.w + mx, size.h + my],
+      kind,
+      window.devicePixelRatio || 1,
+    );
+    scheduleDraw();
+  }
+
+  // A different animal, period or map size: paint at once.
+  $effect(() => {
+    void [world, range];
+    scheduleRaster(0);
+    return () => clearTimeout(rasterTimer);
+  });
+
+  /** Land animals stop at the borders of the countries they are known from. */
+  const clip = $derived<Path2D | null>(
+    world && range?.habitat === 'land' && range.clip ? unionPath(world, range.countries) : null,
+  );
+  /** Periods with no sightings at all show just the countries. */
+  const areaPath = $derived<Path2D | null>(world && range?.basis === 'countries' ? unionPath(world, range.countries) : null);
+  // The same two for the finer outlines, which take over when zoomed in.
+  const clipFine = $derived<Path2D | null>(
+    detail && range?.habitat === 'land' && range.clip ? unionPath(detail, range.countries) : null,
+  );
+  const areaFine = $derived<Path2D | null>(detail && range?.basis === 'countries' ? unionPath(detail, range.countries) : null);
 
   // --- drawing --------------------------------------------------------------
 
@@ -188,13 +284,21 @@
 
   $effect(() => {
     // Track everything the picture depends on.
-    void [present, former, heat, focus, world];
+    void [range, clip, areaPath, clipFine, areaFine, detail, heat, focus, world, basemap];
     scheduleDraw();
   });
 
   function isTiny(s: Shape, k: number): boolean {
     const [x0, y0, x1, y1] = s.bounds;
     return Math.max(x1 - x0, y1 - y0) * k < TINY_PX;
+  }
+
+  function drawTexture(ctx: CanvasRenderingContext2D, t: HeatTexture) {
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.globalAlpha = t.opacity;
+    ctx.drawImage(t.canvas, t.x, t.y, t.w, t.h);
+    ctx.globalAlpha = 1;
   }
 
   function draw() {
@@ -216,33 +320,86 @@
     ctx.strokeStyle = p.grid;
     ctx.stroke(world.graticule);
 
-    const stripes = former.size > 0 ? getHatch(ctx, p, dpr) : null;
-    stripes?.setTransform(new DOMMatrix([1 / (dpr * k), 0, 0, 1 / (dpr * k), 0, 0]));
+    // Zoomed in, the finer outlines (once built) take over from the 50m ones.
+    const fine = detail && k >= DETAIL_K ? detail : null;
+    const base = fine ?? world;
+    // The map's reach in unzoomed units, to skip whatever is off screen.
+    const vx0 = -x / k;
+    const vy0 = -y / k;
+    const vx1 = (size.w - x) / k;
+    const vy1 = (size.h - y) / k;
+    const visible = (s: Shape) => s.bounds[2] >= vx0 && s.bounds[0] <= vx1 && s.bounds[3] >= vy0 && s.bounds[1] <= vy1;
+
+    // Animals of the open sea are painted on the water, before the land is drawn over any stray record.
+    if (heatTex && range?.habitat === 'sea') drawTexture(ctx, heatTex);
 
     const markers: { s: Shape; color: string }[] = [];
+    for (const s of base.shapes) {
+      if (fine && !visible(s)) continue;
+      let fill = p.land;
+      const t = s.code && heat ? heat.get(s.code) : undefined;
+      if (t !== undefined) fill = mix(p.land, p.present, 0.22 + 0.78 * t);
+      ctx.fillStyle = fill;
+      ctx.fill(s.path);
+      if (fill !== p.land && isTiny(s, k) && s.code && world.byCode.get(s.code) === s) markers.push({ s, color: fill });
+    }
+
+    const wz = webZoom(world, k);
+    const bm = basemap;
+    if (bm) {
+      ctx.fillStyle = p.ocean;
+      for (const tier of bm.lakes) if (wz + 1 >= tier.zoom) ctx.fill(tier.path);
+    }
+
+    const areaNow = fine && areaFine ? areaFine : areaPath;
+    const clipNow = fine && clipFine ? clipFine : clip;
+    if (areaNow) {
+      // Nothing recorded for this period: only the countries are known, so say so plainly.
+      ctx.save();
+      ctx.globalAlpha = 0.5;
+      ctx.fillStyle = ESTIMATE_COLOR;
+      ctx.fill(areaNow);
+      ctx.restore();
+    }
+    if (heatTex && range && range.habitat !== 'sea') {
+      ctx.save();
+      // Land animals stop at the coast and at the borders of the countries they are known from.
+      if (clipNow) ctx.clip(clipNow);
+      drawTexture(ctx, heatTex);
+      ctx.restore();
+    }
+
+    if (bm) {
+      // Rivers and lake shores over the colour, light enough that the colour still shows through.
+      ctx.strokeStyle = mix(p.ocean, p.ink, 0.2);
+      ctx.lineWidth = 0.9 / k;
+      for (const tier of bm.rivers) if (wz + 1 >= tier.zoom) ctx.stroke(tier.path);
+      ctx.lineWidth = 0.6 / k;
+      for (const tier of bm.lakes) if (wz + 1 >= tier.zoom) ctx.stroke(tier.path);
+    }
 
     ctx.lineWidth = 0.6 / k;
     ctx.strokeStyle = p.border;
-    for (const s of world.shapes) {
-      let fill: string | CanvasPattern = p.land;
-      const code = s.code;
-      if (code) {
-        if (heat) {
-          const t = heat.get(code);
-          if (t !== undefined) fill = mix(p.land, p.present, 0.22 + 0.78 * t);
-        } else if (present.has(code)) fill = p.present;
-        else if (former.has(code) && stripes) fill = stripes;
-      }
-      ctx.fillStyle = fill;
-      ctx.fill(s.path);
-      ctx.stroke(s.path);
+    if (fine) {
+      // The fine outlines are heavy; stroke only the countries in view.
+      for (const s of fine.shapes) if (visible(s)) ctx.stroke(s.path);
+    } else ctx.stroke(world.borders);
 
-      if (fill !== p.land && isTiny(s, k) && code && world.byCode.get(code) === s) {
-        markers.push({ s, color: typeof fill === 'string' ? fill : p.extinct });
+    if (bm && wz > 2.6) {
+      // State and province borders: fainter than countries, and only for countries in view.
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, (wz - 2.6) / 1.2) * 0.75;
+      ctx.lineWidth = 0.5 / k;
+      ctx.setLineDash([2.5 / k, 2 / k]);
+      for (const b of bm.borders) {
+        const [bx0, by0, bx1, by1] = b.bounds;
+        if (bx1 < vx0 || bx0 > vx1 || by1 < vy0 || by0 > vy1) continue;
+        ctx.stroke(b.path);
       }
+      ctx.restore();
     }
 
-    // Small countries and islands would be invisible; give them a dot.
+    // Small countries and islands would be invisible in the overview; give them a dot.
     for (const { s, color } of markers) {
       ctx.beginPath();
       ctx.arc(s.centroid[0], s.centroid[1], 4.5 / k, 0, Math.PI * 2);
@@ -254,7 +411,7 @@
     }
 
     if (focus) {
-      const s = world.byCode.get(focus);
+      const s = base.byCode.get(focus);
       if (s) {
         ctx.lineWidth = 4 / k;
         ctx.strokeStyle = p.halo;
@@ -264,6 +421,19 @@
         ctx.stroke(s.path);
       }
     }
+
+    // Names last, in screen pixels.
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    dots = drawLabels(ctx, {
+      world,
+      basemap: bm,
+      tx: x,
+      ty: y,
+      k,
+      w: size.w,
+      h: size.h,
+      style: { ink: p.ink, muted: p.muted, halo: p.halo, family: p.family },
+    });
   }
 
   // --- interaction ----------------------------------------------------------
@@ -279,7 +449,8 @@
     const py = (my - y) / k;
     const pad = 5 / k;
     let best: Shape | null = null;
-    for (const s of world.shapes) {
+    const base = detail && transform.k >= DETAIL_K ? detail : world;
+    for (const s of base.shapes) {
       const [x0, y0, x1, y1] = s.bounds;
       if (px < x0 - pad || px > x1 + pad || py < y0 - pad || py > y1 + pad) continue;
       const hit = isTiny(s, k)
@@ -296,7 +467,27 @@
     const mx = e.clientX - r.left;
     const my = e.clientY - r.top;
     const shape = pick(mx, my);
-    tip = shape ? { x: mx, y: my, shape } : null;
+    const at = world?.projection.invert?.([(mx - transform.x) / transform.k, (my - transform.y) / transform.k]);
+    // A city dot wins over the country under it.
+    const dot = dots.find((d) => Math.hypot(d.x - mx, d.y - my) <= 8) ?? null;
+    // Open water has no name, but a sea animal's range still deserves a tooltip there.
+    const overRange =
+      !shape && at && range?.habitat !== 'land' && range?.density && densityAt(range.density, at[0], at[1]) >= MIN_VISIBLE;
+    if (at && (shape || overRange || dot)) {
+      const region = basemap && shape && webZoom(world as World, transform.k) > 2.4 ? regionAt(basemap, at[0], at[1]) : null;
+      tip = {
+        x: mx,
+        y: my,
+        hover: {
+          code: shape?.code ?? dot?.place.code ?? null,
+          country: shape?.name ?? null,
+          region: region?.name ?? null,
+          place: dot?.place ?? null,
+          lon: at[0],
+          lat: at[1],
+        },
+      };
+    } else tip = null;
     (canvas as HTMLCanvasElement).style.cursor = shape?.code ? 'pointer' : 'grab';
   }
 
@@ -310,13 +501,25 @@
     if (canvas && zoomBehavior) select(canvas).call(zoomBehavior.scaleBy, factor);
   }
 
-  function viewFor(codes: string[]): ZoomTransform {
+  /** The view that frames a box of the unzoomed map. */
+  function viewForBox(x0: number, y0: number, x1: number, y1: number): ZoomTransform {
+    const pad = 48;
+    const k = Math.min(14, Math.max(1, Math.min(size.w / (x1 - x0 + pad), size.h / (y1 - y0 + pad))));
+    return zoomIdentity
+      .translate(size.w / 2, size.h / 2)
+      .scale(k)
+      .translate(-(x0 + x1) / 2, -(y0 + y1) / 2);
+  }
+
+  /** Frames where the animal was recorded; failing that, its countries. */
+  function viewForRange(): ZoomTransform {
     if (!world) return zoomIdentity;
+    if (focusBox) return viewForBox(...focusBox);
     let x0 = Infinity,
       y0 = Infinity,
       x1 = -Infinity,
       y1 = -Infinity;
-    for (const code of codes) {
+    for (const code of fitCodes) {
       const s = world.byCode.get(code);
       if (!s) continue;
       x0 = Math.min(x0, s.bounds[0]);
@@ -324,13 +527,7 @@
       x1 = Math.max(x1, s.bounds[2]);
       y1 = Math.max(y1, s.bounds[3]);
     }
-    if (!isFinite(x0)) return zoomIdentity;
-    const pad = 48;
-    const k = Math.min(14, Math.max(1, Math.min(size.w / (x1 - x0 + pad), size.h / (y1 - y0 + pad))));
-    return zoomIdentity
-      .translate(size.w / 2, size.h / 2)
-      .scale(k)
-      .translate(-(x0 + x1) / 2, -(y0 + y1) / 2);
+    return isFinite(x0) ? viewForBox(x0, y0, x1, y1) : zoomIdentity;
   }
 
   /** Smooth van Wijk zoom/pan to `target`. */
@@ -360,12 +557,13 @@
   // Fly to a newly selected animal's range (or back out when none is selected).
   $effect(() => {
     const key = fitKey;
-    if (!world || key === flownTo) return;
+    void focusBox; // the box to frame comes from the range's density
+    if (!world || !fitReady || key === flownTo) return;
     flownTo = key;
-    untrack(() => flyTo(key ? viewFor(fitCodes) : zoomIdentity));
+    untrack(() => flyTo(key ? viewForRange() : zoomIdentity));
   });
 
-  const tipLines = $derived(tip ? label(tip.shape.code) : []);
+  const tipText = $derived(tip ? label(tip.hover) : null);
 </script>
 
 <div class="map" bind:this={host}>
@@ -378,7 +576,7 @@
     onpointerleave={() => (tip = null)}
     {onclick}
   >
-    World map highlighting the countries where the selected animal lives. The same countries are listed in the details panel.
+    World map showing where the selected animal has been recorded, from rare (pale blue) to very common (dark red). The countries it lives in are listed in the details panel.
   </canvas>
 
   {#if !world}
@@ -390,7 +588,7 @@
     <button type="button" onclick={() => zoomBy(1 / 1.6)} aria-label="Zoom out" title="Zoom out"><Icon name="minus" /></button>
     <button type="button" onclick={() => flyTo(zoomIdentity)} aria-label="Reset view" title="Show whole world"><Icon name="reset" /></button>
     {#if fitCodes.length}
-      <button type="button" onclick={() => flyTo(viewFor(fitCodes))} aria-label="Zoom to range" title="Zoom to this animal's range"><Icon name="target" /></button>
+      <button type="button" onclick={() => flyTo(viewForRange())} aria-label="Zoom to range" title="Zoom to this animal's range"><Icon name="target" /></button>
     {/if}
   </div>
 
@@ -401,8 +599,8 @@
       class:up={tip.y > size.h - 110}
       style="left:{tip.x}px;top:{tip.y}px"
     >
-      <strong>{tip.shape.name}</strong>
-      {#each tipLines as line}
+      <strong>{tipText?.title}</strong>
+      {#each tipText?.lines ?? [] as line}
         <span>{line}</span>
       {/each}
     </div>
