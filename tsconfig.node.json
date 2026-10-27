@@ -13,5 +13,5 @@
     "noEmit": true,
     "types": ["node"]
   },
-  "include": ["scripts/**/*.ts", "data/**/*.ts", "src/lib/types.ts"]
+  "include": ["scripts/**/*.ts", "data/**/*.ts", "src/lib/types.ts", "src/lib/grid.ts"]
 }

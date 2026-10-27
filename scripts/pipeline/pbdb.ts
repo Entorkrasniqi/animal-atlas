@@ -46,17 +46,22 @@ export interface FossilOccurrence {
   /** Age bounds in years before present (1950): the find is somewhere in [youngest, oldest]. */
   oldestBp: number;
   youngestBp: number;
+  /** Where it was dug up, when PBDB has coordinates. */
+  lon?: number;
+  lat?: number;
 }
 
 interface OccRecord {
   cc2?: string;
   eag?: number;
   lag?: number;
+  lng?: number | string;
+  lat?: number | string;
 }
 
 export async function occurrences(name: string): Promise<FossilOccurrence[]> {
   const res = await getJson<{ records?: OccRecord[] }>(
-    `${API}/occs/list.json?base_name=${encodeURIComponent(name)}&show=loc&limit=all`,
+    `${API}/occs/list.json?base_name=${encodeURIComponent(name)}&show=loc,coords&limit=all`,
   );
   const out: FossilOccurrence[] = [];
   for (const r of res?.records ?? []) {
@@ -65,6 +70,8 @@ export async function occurrences(name: string): Promise<FossilOccurrence[]> {
       country: r.cc2 ? alpha3(r.cc2) : null,
       oldestBp: Math.round(r.eag * 1e6),
       youngestBp: Math.round(r.lag * 1e6),
+      lon: r.lng === undefined ? undefined : Number(r.lng),
+      lat: r.lat === undefined ? undefined : Number(r.lat),
     });
   }
   return out;

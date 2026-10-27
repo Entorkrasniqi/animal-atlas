@@ -1,5 +1,5 @@
 import { geoNaturalEarth1, geoPath } from 'd3-geo';
-import type { GeoPermissibleObjects } from 'd3-geo';
+import type { GeoPermissibleObjects, GeoProjection } from 'd3-geo';
 import countries from 'i18n-iso-countries';
 import en from 'i18n-iso-countries/langs/en.json';
 import { feature } from 'topojson-client';
@@ -53,10 +53,21 @@ export interface Shape {
 export interface World {
   width: number;
   height: number;
+  projection: GeoProjection;
   shapes: Shape[];
   sphere: Path2D;
   graticule: Path2D;
+  /** Every country outline in one path, for drawing the borders in a single stroke. */
+  borders: Path2D;
   byCode: Map<string, Shape>;
+}
+
+/** One path covering all the shapes of the given countries (mainland and far-flung territories alike). */
+export function unionPath(world: World, codes: Iterable<string>): Path2D {
+  const wanted = new Set(codes);
+  const path = new Path2D();
+  for (const s of world.shapes) if (s.code && wanted.has(s.code)) path.addPath(s.path);
+  return path;
 }
 
 let topologyPromise: Promise<FeatureCollection<Geometry, { name: string }>> | null = null;
@@ -85,6 +96,7 @@ export function buildWorld(
   const toPath = geoPath(projection);
   const shapes: Shape[] = [];
   const byCode = new Map<string, Shape>();
+  const borders = new Path2D();
 
   for (const f of collection.features as Feature<Geometry, { name: string }>[]) {
     const d = toPath(f as GeoPermissibleObjects);
@@ -100,6 +112,7 @@ export function buildWorld(
       area: toPath.area(f as GeoPermissibleObjects),
     };
     shapes.push(shape);
+    borders.addPath(shape.path);
     // Several features can share a code (mainland + far-flung territories): keep the largest.
     if (code && shape.area > (byCode.get(code)?.area ?? -1)) byCode.set(code, shape);
   }
@@ -107,8 +120,10 @@ export function buildWorld(
   return {
     width,
     height,
+    projection,
     shapes,
     byCode,
+    borders,
     sphere: new Path2D(toPath({ type: 'Sphere' }) ?? ''),
     graticule: new Path2D(toPath(graticule()) ?? ''),
   };

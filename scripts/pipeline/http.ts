@@ -46,6 +46,8 @@ export interface Response {
 export interface FetchOptions {
   /** Don't read or write the cache (for volatile lookups such as PhyloPic's build number). */
   noCache?: boolean;
+  /** The body is binary (e.g. a vector tile): it is cached and returned base64-encoded. */
+  binary?: boolean;
 }
 
 async function readCache(file: string): Promise<CacheEntry | null> {
@@ -82,7 +84,7 @@ export async function get(url: string, options: FetchOptions = {}): Promise<Resp
         await new Promise((r) => setTimeout(r, 1500 * 2 ** attempt));
         continue;
       }
-      const body = await res.text();
+      const body = options.binary ? Buffer.from(await res.arrayBuffer()).toString('base64') : await res.text();
       if (!options.noCache) {
         await mkdir(CACHE_DIR, { recursive: true });
         const entry: CacheEntry = { url, status: res.status, body, fetchedAt: new Date().toISOString() };

@@ -15,12 +15,14 @@ import path from 'node:path';
 import { seeds } from '../../data/curated';
 import { buildAnimal, type Built, type Flag, type FlagKind } from './build';
 import { mapLimit, setRefresh } from './http';
+import type { RangeData } from '../../src/lib/types';
 
 const args = process.argv.slice(2);
 const only = args.find((a) => a.startsWith('--only='))?.slice(7).split(',');
 setRefresh(args.includes('--refresh'));
 
 const OUT_JSON = path.resolve('src/data/generated/animals.json');
+const OUT_RANGES = path.resolve('src/data/generated/ranges');
 const OUT_REPORT = path.resolve('data/generated/report.md');
 const OUT_SVG = path.resolve('public/silhouettes');
 
@@ -73,6 +75,15 @@ await mkdir(path.dirname(OUT_JSON), { recursive: true });
 const generatedAt = new Date().toISOString().slice(0, 10);
 await writeFile(OUT_JSON, JSON.stringify({ generatedAt, animals }, null, 1) + '\n');
 
+// --- range layers: one file per animal, loaded when it is selected -----------------
+await mkdir(OUT_RANGES, { recursive: true });
+for (const b of built) {
+  const data: RangeData = { layers: b.layers };
+  await writeFile(path.join(OUT_RANGES, `${b.animal.id}.json`), JSON.stringify(data));
+}
+const keep = new Set(built.map((b) => `${b.animal.id}.json`));
+for (const file of await readdir(OUT_RANGES)) if (!keep.has(file)) await rm(path.join(OUT_RANGES, file));
+
 // --- report ------------------------------------------------------------------------
 const TITLES: Record<FlagKind, string> = {
   'no-gbif-match': 'No GBIF match',
@@ -82,11 +93,13 @@ const TITLES: Record<FlagKind, string> = {
   'gbif-unconfirmed': 'Listed countries with no GBIF records (kept, but unconfirmed)',
   'gbif-candidates': 'GBIF records outside the curated range (not applied)',
   'pbdb-extended': 'Ice Age ranges extended by fossil finds (applied)',
+  'range-coarse': 'Periods not drawn from their own records (too few sightings or fossil finds)',
   'silhouette-relative': 'Silhouette shows a relative, not the species',
   'no-silhouette': 'No silhouette available',
   'no-article': 'No Wikipedia article found',
 };
 const byKind = (kind: FlagKind): Flag[] => flags.filter((f) => f.kind === kind);
+const layerCount = (basis: string) => built.flatMap((b) => b.layers).filter((l) => l.basis === basis).length;
 const rankCount = (rank: string) => animals.filter((a) => a.silhouette?.rank === rank).length;
 
 const report = [
@@ -105,6 +118,10 @@ const report = [
   `| No silhouette | ${animals.filter((a) => !a.silhouette).length} |`,
   `| Wikipedia article linked | ${animals.filter((a) => a.sources?.some((s) => s.label === 'Wikipedia')).length} |`,
   `| Paleobiology Database entry linked | ${animals.filter((a) => a.sources?.some((s) => s.label === 'Paleobiology Database')).length} |`,
+  `| Range periods drawn from their own sightings or fossils | ${layerCount('records')} |`,
+  `| Range periods drawn from all records inside their countries | ${layerCount('all-time')} |`,
+  `| Range periods drawn from a hand-drawn area (\`data/curated/areas.ts\`) | ${layerCount('area')} |`,
+  `| Range periods known only as whole countries | ${layerCount('countries')} |`,
   ``,
   ...(Object.keys(TITLES) as FlagKind[]).flatMap((kind) => {
     const items = byKind(kind);

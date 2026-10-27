@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-10-25",
+ "generatedAt": "2026-10-27",
  "animals": [
   {
    "id": "african-lion",
@@ -128,6 +128,7 @@
     "Name matched to the GBIF Backbone as Panthera leo (family Felidae).",
     "Conservation status (Vulnerable) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 14,589 records from 1990 onward; they confirm 23 of 26 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (179, 14,401 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -136,6 +137,7 @@
    "name": "African penguin",
    "scientific": "Spheniscus demersus",
    "group": "bird",
+   "habitat": "coast",
    "status": "CR",
    "statusSource": "iucn",
    "about": "Once millions strong, egg-collecting, guano mining and sardine overfishing have left fewer than 20,000 adults.",
@@ -186,6 +188,7 @@
     "Name matched to the GBIF Backbone as Spheniscus demersus (family Spheniscidae).",
     "Conservation status (Critically Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 13,693 records from 1990 onward; they confirm 2 of 2 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (14,833 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -319,6 +322,7 @@
     "Name matched to the GBIF Backbone as Loxodonta africana (family Elephantidae).",
     "Conservation status (Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 22,790 records from 1990 onward; they confirm 22 of 31 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (284, 22,865 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -435,6 +439,7 @@
     "Name matched to the GBIF Backbone as Lycaon pictus (family Canidae).",
     "Conservation status (Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 1,949 records from 1990 onward; they confirm 12 of 18 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (48, 1,861 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -488,6 +493,7 @@
     "Name matched to the GBIF Backbone as Alligator mississippiensis (family Alligatoridae).",
     "Conservation status (Least Concern) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 63,025 records from 1990 onward; they confirm 1 of 1 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (63,635 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -566,6 +572,7 @@
     "Name matched to the GBIF Backbone as Bison bison (family Bovidae).",
     "Conservation status (Near Threatened) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 23,341 records from 1990 onward; they confirm 3 of 3 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (50, 6,657, 17,336 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -629,6 +636,7 @@
     "Name matched to the GBIF Backbone as Panthera pardus orientalis (family Felidae).",
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
     "GBIF holds 42 records from 1990 onward; they confirm 1 of 2 countries in the latest range.",
+    "1 of 2 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -718,6 +726,7 @@
     "Name matched to the GBIF Backbone as Elephas maximus (family Elephantidae).",
     "Conservation status (Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 10,587 records from 1990 onward; they confirm 11 of 13 countries in the latest range.",
+    "1 of 2 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -799,6 +808,7 @@
     "Name matched to the GBIF Backbone as Panthera leo persica (family Felidae).",
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
     "GBIF holds 11 records from 1990 onward; they confirm 1 of 1 countries in the latest range.",
+    "1 of 3 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -807,6 +817,7 @@
    "name": "Atlantic bluefin tuna",
    "scientific": "Thunnus thynnus",
    "group": "fish",
+   "habitat": "sea",
    "status": "LC",
    "statusSource": "iucn",
    "about": "A warm-blooded, 3-metre ocean sprinter. Overfishing drove the spawning stock down by about 80%; tight quotas since 2010 have let it rebound.",
@@ -867,7 +878,8 @@
    "notes": [
     "Name matched to the GBIF Backbone as Thunnus thynnus (family Scombridae).",
     "Conservation status (Least Concern) comes from the IUCN Red List, as mirrored by GBIF.",
-    "GBIF holds 9,055 records from 1990 onward; they confirm 18 of 23 countries in the latest range."
+    "GBIF holds 9,055 records from 1990 onward; they confirm 18 of 23 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (9,176 records)."
    ]
   },
   {
@@ -913,6 +925,7 @@
     "Name matched to the GBIF Backbone as Ursus arctos crowtheri (family Ursidae).",
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
     "GBIF holds no usable records for 1500 to 1870.",
+    "0 of 1 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "The extinction date is curated from published estimates, not machine-generated."
    ]
   },
@@ -1012,6 +1025,7 @@
     "Conservation status (Extinct) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 24 records from 1500 to 1627; they confirm 0 of 1 countries in the latest range.",
     "The Paleobiology Database holds 98 fossil occurrences of this species.",
+    "1 of 3 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "Population figures and the extinction date are curated from published estimates, not machine-generated."
    ]
   },
@@ -1058,7 +1072,8 @@
    "notes": [
     "Name matched to the GBIF Backbone as Ambystoma mexicanum (family Ambystomatidae).",
     "Conservation status (Critically Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
-    "GBIF holds 25 records from 1990 onward; they confirm 1 of 1 countries in the latest range."
+    "GBIF holds 25 records from 1990 onward; they confirm 1 of 1 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (144 records)."
    ]
   },
   {
@@ -1126,6 +1141,7 @@
     "IUCN lists it as Critically Endangered (possibly extinct) because extinction is not formally confirmed. This atlas dates its extinction to 2006; see the description for why.",
     "GBIF holds no usable records for 1500 to 2006.",
     "The Paleobiology Database holds 2 fossil occurrences of this species.",
+    "0 of 1 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "Population figures and the extinction date are curated from published estimates, not machine-generated."
    ]
   },
@@ -1194,6 +1210,7 @@
     "Name matched to the GBIF Backbone as Haliaeetus leucocephalus (family Accipitridae).",
     "Conservation status (Least Concern) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 7,722,620 records from 1990 onward; they confirm 3 of 3 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (7,769,070 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -1238,6 +1255,7 @@
     "Name matched to the GBIF Backbone as Panthera tigris balica (family Felidae).",
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
     "GBIF holds 1 record from 1500 to 1937; they confirm 0 of 1 countries in the latest range.",
+    "0 of 1 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "The extinction date is curated from published estimates, not machine-generated."
    ]
   },
@@ -1246,6 +1264,7 @@
    "name": "Beluga sturgeon",
    "scientific": "Huso huso",
    "group": "fish",
+   "habitat": "coast",
    "status": "CR",
    "statusSource": "iucn",
    "about": "Source of the finest caviar, it can live over 100 years and reach 6 m. Dams block its spawning migrations and poaching continues.",
@@ -1311,7 +1330,8 @@
    "notes": [
     "Name matched to the GBIF Backbone as Huso huso (family Acipenseridae).",
     "Conservation status (Critically Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
-    "GBIF holds 39 records from 1990 onward; they confirm 2 of 9 countries in the latest range."
+    "GBIF holds 39 records from 1990 onward; they confirm 2 of 9 countries in the latest range.",
+    "1 of 2 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report)."
    ]
   },
   {
@@ -1428,6 +1448,7 @@
     "Name matched to the GBIF Backbone as Diceros bicornis (family Rhinocerotidae).",
     "Conservation status (Critically Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 2,082 records from 1990 onward; they confirm 9 of 10 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (50, 288, 1,668 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -1436,6 +1457,7 @@
    "name": "Blue whale",
    "scientific": "Balaenoptera musculus",
    "group": "mammal",
+   "habitat": "sea",
    "status": "EN",
    "statusSource": "iucn",
    "about": "The largest animal that has ever lived. Industrial whaling killed ~360,000 in the 20th century; they are recovering slowly. Countries listed are those whose waters they visit.",
@@ -1514,6 +1536,7 @@
     "Name matched to the GBIF Backbone as Balaenoptera musculus (family Balaenopteridae).",
     "Conservation status (Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 19,882 records from 1990 onward; they confirm 18 of 30 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (27,561 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -1567,6 +1590,7 @@
     "Conservation status (Extinct) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds no usable records for 1500 to 1800.",
     "The Paleobiology Database holds 13 fossil occurrences of this species.",
+    "0 of 1 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "The extinction date is curated from published estimates, not machine-generated."
    ]
   },
@@ -1625,6 +1649,7 @@
     "Name matched to the GBIF Backbone as Pongo pygmaeus (family Hominidae).",
     "Conservation status (Critically Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 2,071 records from 1990 onward; they confirm 2 of 2 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (2,132 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -1683,6 +1708,7 @@
     "Name matched to the GBIF Backbone as Melomys rubicola (family Muridae).",
     "Conservation status (Extinct) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 1 record from 1500 to 2009; they confirm 0 of 1 countries in the latest range.",
+    "0 of 1 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "Population figures and the extinction date are curated from published estimates, not machine-generated."
    ]
   },
@@ -1767,6 +1793,7 @@
     "Name matched to the GBIF Backbone as Gymnogyps californianus (family Cathartidae).",
     "Conservation status (Critically Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 32,176 records from 1990 onward; they confirm 2 of 2 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (109, 1,006, 31,784 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -1775,6 +1802,7 @@
    "name": "Caribbean monk seal",
    "scientific": "Neomonachus tropicalis",
    "group": "mammal",
+   "habitat": "coast",
    "status": "EX",
    "statusSource": "iucn",
    "extinctYear": 1952,
@@ -1839,6 +1867,7 @@
     "Conservation status (Extinct) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 7 records from 1500 to 1952; they confirm 0 of 5 countries in the latest range.",
     "The Paleobiology Database holds 93 fossil occurrences of this species.",
+    "1 of 2 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "The extinction date is curated from published estimates, not machine-generated."
    ]
   },
@@ -1892,6 +1921,7 @@
     "Conservation status (Extinct) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 273 records from 1500 to 1918; they confirm 1 of 1 countries in the latest range.",
     "The Paleobiology Database holds 2 fossil occurrences of this species.",
+    "The map is drawn from recorded sightings and fossil finds in every period (273 records).",
     "The extinction date is curated from published estimates, not machine-generated."
    ]
   },
@@ -1967,6 +1997,7 @@
     "Name matched to the GBIF Backbone as Panthera tigris virgata (family Felidae).",
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
     "GBIF holds no usable records for 1500 to 1970.",
+    "0 of 3 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "The extinction date is curated from published estimates, not machine-generated."
    ]
   },
@@ -2035,6 +2066,7 @@
     "Name matched to the GBIF Backbone as Ursus spelaeus (family Ursidae).",
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
     "The Paleobiology Database holds 30 fossil occurrences of this species.",
+    "0 of 1 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "The extinction date is curated from published estimates, not machine-generated."
    ]
   },
@@ -2250,6 +2282,7 @@
     "Name matched to the GBIF Backbone as Acinonyx jubatus (family Felidae).",
     "Conservation status (Vulnerable) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 8,378 records from 1990 onward; they confirm 15 of 26 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (29, 12, 6,626, 1,766 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -2355,6 +2388,7 @@
     "Name matched to the GBIF Backbone as Pan troglodytes (family Hominidae).",
     "Conservation status (Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 2,144 records from 1990 onward; they confirm 14 of 20 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (76, 3,939 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -2408,6 +2442,7 @@
     "Name matched to the GBIF Backbone as Alligator sinensis (family Alligatoridae).",
     "Conservation status (Critically Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 26 records from 1990 onward; they confirm 1 of 1 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (42 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -2454,7 +2489,8 @@
    "notes": [
     "Name matched to the GBIF Backbone as Andrias davidianus (family Cryptobranchidae).",
     "Conservation status (Critically Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
-    "GBIF holds 9 records from 1990 onward; they confirm 1 of 1 countries in the latest range."
+    "GBIF holds 9 records from 1990 onward; they confirm 1 of 1 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (12 records)."
    ]
   },
   {
@@ -2506,6 +2542,7 @@
     "Name matched to the GBIF Backbone as Psephurus gladius (family Polyodontidae).",
     "Conservation status (Extinct) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 5 records from 1500 to 2005; they confirm 1 of 1 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (5 records).",
     "The extinction date is curated from published estimates, not machine-generated."
    ]
   },
@@ -2514,6 +2551,7 @@
    "name": "Coelacanth",
    "scientific": "Latimeria chalumnae",
    "group": "fish",
+   "habitat": "sea",
    "status": "CR",
    "statusSource": "iucn",
    "about": "Known only from fossils and presumed extinct for ~66 million years — until a living one was caught off South Africa in 1938.",
@@ -2564,6 +2602,7 @@
     "Name matched to the GBIF Backbone as Latimeria chalumnae (family Latimeriidae).",
     "Conservation status (Critically Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 40 records from 1990 onward; they confirm 5 of 6 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (66 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -2612,6 +2651,7 @@
     "Name matched to the GBIF Backbone as Diprotodon optatum (family Diprotodontidae).",
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
     "The Paleobiology Database holds 26 fossil occurrences of this species.",
+    "0 of 1 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "The extinction date is curated from published estimates, not machine-generated."
    ]
   },
@@ -2667,6 +2707,7 @@
     "Name matched to the GBIF Backbone as Aenocyon dirus (family Canidae).",
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
     "The Paleobiology Database holds 86 fossil occurrences of this species.",
+    "The map is drawn from recorded sightings and fossil finds in every period (18 records).",
     "The extinction date is curated from published estimates, not machine-generated."
    ]
   },
@@ -2720,6 +2761,7 @@
     "Conservation status (Extinct) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds no usable records for 1500 to 1662.",
     "The Paleobiology Database holds 4 fossil occurrences of this species.",
+    "0 of 1 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "The extinction date is curated from published estimates, not machine-generated."
    ]
   },
@@ -2767,6 +2809,7 @@
    "notes": [
     "Name matched to the GBIF Backbone as Aepyornis maximus (family Aepyornithidae).",
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
+    "0 of 1 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "The extinction date is curated from published estimates, not machine-generated."
    ]
   },
@@ -2775,6 +2818,7 @@
    "name": "Emperor penguin",
    "scientific": "Aptenodytes forsteri",
    "group": "bird",
+   "habitat": "coast",
    "status": "NT",
    "statusSource": "iucn",
    "about": "The only penguin to breed in the Antarctic winter. Breeding colonies depend on stable sea ice, which is declining.",
@@ -2820,6 +2864,7 @@
     "Name matched to the GBIF Backbone as Aptenodytes forsteri (family Spheniscidae).",
     "Conservation status (Near Threatened) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 129,769 records from 1990 onward; they confirm 1 of 1 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (66,099 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -2873,6 +2918,7 @@
     "Conservation status (Extinct) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 2 records from 1500 to 1876; they confirm 0 of 1 countries in the latest range.",
     "The Paleobiology Database holds 1 fossil occurrence of this species.",
+    "0 of 1 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "The extinction date is curated from published estimates, not machine-generated."
    ]
   },
@@ -2930,6 +2976,7 @@
     "GBIF has no single entry for this taxon, so lookups use its genus, Chelonoidis.",
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
     "GBIF holds 7,940 records from 1990 onward; they confirm 1 of 1 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (3,786 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -3003,6 +3050,7 @@
     "Name matched to the GBIF Backbone as Gavialis gangeticus (family Gavialidae).",
     "Conservation status (Critically Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 789 records from 1990 onward; they confirm 2 of 2 countries in the latest range.",
+    "1 of 2 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -3070,6 +3118,7 @@
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
     "The Paleobiology Database holds 15 fossil occurrences of this species.",
     "Fossil finds added 1 country to the Ice Age range (GRC).",
+    "0 of 2 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "The extinction date is curated from published estimates, not machine-generated."
    ]
   },
@@ -3115,6 +3164,7 @@
     "Name matched to the GBIF Backbone as Megatherium americanum (family Megatheriidae).",
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
     "The Paleobiology Database holds 37 fossil occurrences of this species.",
+    "0 of 1 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "The extinction date is curated from published estimates, not machine-generated."
    ]
   },
@@ -3188,6 +3238,7 @@
     "Name matched to the GBIF Backbone as Ailuropoda melanoleuca (family Ursidae).",
     "Conservation status (Vulnerable) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 28 records from 1990 onward; they confirm 1 of 1 countries in the latest range.",
+    "1 of 2 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -3303,6 +3354,7 @@
     "Name matched to the GBIF Backbone as Giraffa camelopardalis (family Giraffidae).",
     "Conservation status (Vulnerable) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 3,672 records from 1990 onward; they confirm 11 of 21 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (30, 3,642 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -3349,7 +3401,8 @@
    "notes": [
     "Name matched to the GBIF Backbone as Phyllobates terribilis (family Dendrobatidae).",
     "Conservation status (Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
-    "GBIF holds 338 records from 1990 onward; they confirm 1 of 1 countries in the latest range."
+    "GBIF holds 338 records from 1990 onward; they confirm 1 of 1 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (341 records)."
    ]
   },
   {
@@ -3411,6 +3464,7 @@
     "Name matched to the GBIF Backbone as Incilius periglenes (family Bufonidae).",
     "Conservation status (Extinct) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 80 records from 1500 to 1989; they confirm 1 of 1 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (80 records).",
     "Population figures and the extinction date are curated from published estimates, not machine-generated."
    ]
   },
@@ -3419,6 +3473,7 @@
    "name": "Great auk",
    "scientific": "Pinguinus impennis",
    "group": "bird",
+   "habitat": "coast",
    "status": "EX",
    "statusSource": "iucn",
    "extinctYear": 1844,
@@ -3486,6 +3541,7 @@
     "Conservation status (Extinct) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 98 records from 1500 to 1844; they confirm 1 of 1 countries in the latest range.",
     "The Paleobiology Database holds 126 fossil occurrences of this species.",
+    "The map is drawn from recorded sightings and fossil finds in every period (101, 7 records).",
     "Population figures and the extinction date are curated from published estimates, not machine-generated."
    ]
   },
@@ -3548,6 +3604,7 @@
     "Name matched to the GBIF Backbone as Ardeotis nigriceps (family Otididae).",
     "Conservation status (Critically Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 160 records from 1990 onward; they confirm 1 of 2 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (163 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -3556,6 +3613,7 @@
    "name": "Great white shark",
    "scientific": "Carcharodon carcharias",
    "group": "fish",
+   "habitat": "sea",
    "status": "VU",
    "statusSource": "iucn",
    "about": "The largest predatory fish. Slow to mature and slow to breed, it cannot withstand heavy fishing pressure. Countries listed are those whose coastal waters it visits.",
@@ -3623,7 +3681,8 @@
    "notes": [
     "Name matched to the GBIF Backbone as Carcharodon carcharias (family Lamnidae).",
     "Conservation status (Vulnerable) comes from the IUCN Red List, as mirrored by GBIF.",
-    "GBIF holds 15,195 records from 1990 onward; they confirm 13 of 30 countries in the latest range."
+    "GBIF holds 15,195 records from 1990 onward; they confirm 13 of 30 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (15,402 records)."
    ]
   },
   {
@@ -3696,6 +3755,7 @@
     "Name matched to the GBIF Backbone as Rhinoceros unicornis (family Rhinocerotidae).",
     "Conservation status (Vulnerable) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 1,234 records from 1990 onward; they confirm 2 of 2 countries in the latest range.",
+    "1 of 2 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -4235,6 +4295,7 @@
     "Name matched to the GBIF Backbone as Canis lupus (family Canidae).",
     "Conservation status (Least Concern) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 142,699 records from 1990 onward; they confirm 56 of 60 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (9,222, 17,254, 3,845, 2,067, 1,776, 10,441, 13,810, 59,921 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -4278,6 +4339,7 @@
    "notes": [
     "Name matched to the GBIF Backbone as Harpagornis moorei (family Accipitridae).",
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
+    "0 of 1 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "The extinction date is curated from published estimates, not machine-generated."
    ]
   },
@@ -4414,6 +4476,7 @@
     "Name matched to the GBIF Backbone as Hippopotamus amphibius (family Hippopotamidae).",
     "Conservation status (Vulnerable) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 11,686 records from 1990 onward; they confirm 32 of 38 countries in the latest range.",
+    "1 of 2 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -4422,6 +4485,7 @@
    "name": "Humpback whale",
    "scientific": "Megaptera novaeangliae",
    "group": "mammal",
+   "habitat": "sea",
    "status": "LC",
    "statusSource": "iucn",
    "about": "Famous for haunting songs and breaching. Hunted to around 5,000 animals by the 1960s, many populations have rebounded since the whaling ban.",
@@ -4502,6 +4566,7 @@
     "Name matched to the GBIF Backbone as Megaptera novaeangliae (family Balaenopteridae).",
     "Conservation status (Least Concern) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 474,197 records from 1990 onward; they confirm 27 of 28 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (484,371 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -4557,6 +4622,7 @@
     "Name matched to the GBIF Backbone as Anodorhynchus hyacinthinus (family Psittacidae).",
     "Conservation status (Vulnerable) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 18,426 records from 1990 onward; they confirm 3 of 3 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (18,480 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -4652,6 +4718,7 @@
     "Name matched to the GBIF Backbone as Lynx pardinus (family Felidae).",
     "Conservation status (Vulnerable) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 937 records from 1990 onward; they confirm 2 of 2 countries in the latest range.",
+    "3 of 4 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -4746,6 +4813,7 @@
     "Name matched to the GBIF Backbone as Panthera onca (family Felidae).",
     "Conservation status (Near Threatened) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 141,941 records from 1990 onward; they confirm 16 of 17 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (127, 141,643 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -4796,6 +4864,7 @@
     "Name matched to the GBIF Backbone as Canis lupus hodophilax (family Canidae).",
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
     "GBIF holds 1 record from 1500 to 1905; they confirm 0 of 1 countries in the latest range.",
+    "0 of 1 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "Population figures and the extinction date are curated from published estimates, not machine-generated."
    ]
   },
@@ -4878,6 +4947,7 @@
     "Name matched to the GBIF Backbone as Rhinoceros sondaicus (family Rhinocerotidae).",
     "Conservation status (Critically Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 7 records from 1990 onward; they confirm 1 of 1 countries in the latest range.",
+    "1 of 3 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -4922,6 +4992,7 @@
     "Name matched to the GBIF Backbone as Panthera tigris sondaica (family Felidae).",
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
     "GBIF holds no usable records for 1500 to 1976.",
+    "0 of 1 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "The extinction date is curated from published estimates, not machine-generated."
    ]
   },
@@ -4987,6 +5058,7 @@
     "Name matched to the GBIF Backbone as Strigops habroptila (family Psittacidae).",
     "Conservation status (Critically Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 179 records from 1990 onward; they confirm 1 of 1 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (200 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -5033,7 +5105,8 @@
    "notes": [
     "Name matched to the GBIF Backbone as Phascolarctos cinereus (family Phascolarctidae).",
     "Conservation status (Vulnerable) comes from the IUCN Red List, as mirrored by GBIF.",
-    "GBIF holds 331,835 records from 1990 onward; they confirm 1 of 1 countries in the latest range."
+    "GBIF holds 331,835 records from 1990 onward; they confirm 1 of 1 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (340,391 records)."
    ]
   },
   {
@@ -5086,6 +5159,7 @@
     "Name matched to the GBIF Backbone as Varanus komodoensis (family Varanidae).",
     "Conservation status (Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 1,024 records from 1990 onward; they confirm 1 of 1 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (1,037 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -5094,6 +5168,7 @@
    "name": "Labrador duck",
    "scientific": "Camptorhynchus labradorius",
    "group": "bird",
+   "habitat": "coast",
    "status": "EX",
    "statusSource": "iucn",
    "extinctYear": 1878,
@@ -5135,6 +5210,7 @@
     "Name matched to the GBIF Backbone as Camptorhynchus labradorius (family Anatidae).",
     "Conservation status (Extinct) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 6 records from 1500 to 1878; they confirm 2 of 2 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (6 records).",
     "The extinction date is curated from published estimates, not machine-generated."
    ]
   },
@@ -5143,6 +5219,7 @@
    "name": "Leatherback sea turtle",
    "scientific": "Dermochelys coriacea",
    "group": "reptile",
+   "habitat": "sea",
    "status": "VU",
    "statusSource": "iucn",
    "about": "The biggest turtle, diving over 1,000 m and crossing entire oceans. Pacific nesting populations have fallen by more than 90%. Countries listed are those with nesting beaches.",
@@ -5219,6 +5296,7 @@
     "Name matched to the GBIF Backbone as Dermochelys coriacea (family Dermochelyidae).",
     "Conservation status (Vulnerable) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 25,501 records from 1990 onward; they confirm 24 of 27 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (51,768 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -5272,6 +5350,7 @@
     "Name matched to the GBIF Backbone as Dryococelus australis (family Phasmatidae).",
     "Conservation status (Critically Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 17 records from 1990 onward; they confirm 1 of 1 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (6 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -5336,6 +5415,7 @@
     "Name matched to the GBIF Backbone as Danaus plexippus plexippus (family Nymphalidae).",
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
     "GBIF holds 11,952 records from 1990 onward; they confirm 3 of 3 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (13,246 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -5399,6 +5479,7 @@
     "Name matched to the GBIF Backbone as Gorilla beringei beringei (family Hominidae).",
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
     "GBIF holds 844 records from 1990 onward; they confirm 3 of 3 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (852 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -5476,6 +5557,7 @@
     "Name matched to the GBIF Backbone as Ceratotherium simum cottoni (family Rhinocerotidae).",
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
     "GBIF holds 4 records from 1990 onward; they confirm 1 of 1 countries in the latest range.",
+    "1 of 3 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -5552,6 +5634,7 @@
     "Conservation status (Extinct) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 488 records from 1500 to 1914; they confirm 2 of 2 countries in the latest range.",
     "The Paleobiology Database holds 36 fossil occurrences of this species.",
+    "The map is drawn from recorded sightings and fossil finds in every period (505 records).",
     "Population figures and the extinction date are curated from published estimates, not machine-generated."
    ]
   },
@@ -5606,6 +5689,7 @@
     "Name matched to the GBIF Backbone as Pithecophaga jefferyi (family Accipitridae).",
     "Conservation status (Critically Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 76 records from 1990 onward; they confirm 1 of 1 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (119 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -5668,6 +5752,7 @@
     "Name matched to the GBIF Backbone as Chelonoidis abingdonii (family Testudinidae).",
     "Conservation status (Extinct) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 24 records from 1500 to 2012; they confirm 1 of 1 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (24 records).",
     "Population figures and the extinction date are curated from published estimates, not machine-generated."
    ]
   },
@@ -5730,6 +5815,7 @@
     "Name matched to the GBIF Backbone as Melamprosops phaeosoma (family Fringillidae).",
     "Conservation status (Extinct) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 12 records from 1500 to 2004; they confirm 1 of 1 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (12 records).",
     "Population figures and the extinction date are curated from published estimates, not machine-generated."
    ]
   },
@@ -5738,6 +5824,7 @@
    "name": "Polar bear",
    "scientific": "Ursus maritimus",
    "group": "mammal",
+   "habitat": "coast",
    "status": "VU",
    "statusSource": "iucn",
    "about": "Depends on sea ice to hunt seals. Arctic sea ice is shrinking about 13% per decade, shortening the hunting season.",
@@ -5787,6 +5874,7 @@
     "Name matched to the GBIF Backbone as Ursus maritimus (family Ursidae).",
     "Conservation status (Vulnerable) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 3,882 records from 1990 onward; they confirm 5 of 5 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (5,097 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -5850,6 +5938,7 @@
     "Name matched to the GBIF Backbone as Capra pyrenaica pyrenaica (family Bovidae).",
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
     "GBIF holds 4 records from 1500 to 2000; they confirm 1 of 1 countries in the latest range.",
+    "0 of 2 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "Population figures and the extinction date are curated from published estimates, not machine-generated."
    ]
   },
@@ -5905,6 +5994,7 @@
     "Name matched to the GBIF Backbone as Equus quagga quagga (family Equidae).",
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
     "GBIF holds no usable records for 1500 to 1883.",
+    "0 of 1 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "Population figures and the extinction date are curated from published estimates, not machine-generated."
    ]
   },
@@ -5954,6 +6044,7 @@
     "Conservation status (Critically Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
     "IUCN lists it as Critically Endangered (possibly extinct) because extinction is not formally confirmed. This atlas dates its extinction to 2016; see the description for why.",
     "GBIF holds 11 records from 1500 to 2016; they confirm 1 of 1 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (11 records).",
     "The extinction date is curated from published estimates, not machine-generated."
    ]
   },
@@ -6018,6 +6109,7 @@
     "Conservation status (Extinct) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 57 records from 1500 to 1902; they confirm 2 of 2 countries in the latest range.",
     "The Paleobiology Database holds 2 fossil occurrences of this species.",
+    "The map is drawn from recorded sightings and fossil finds in every period (59 records).",
     "Population figures and the extinction date are curated from published estimates, not machine-generated."
    ]
   },
@@ -6071,6 +6163,7 @@
     "Conservation status (Extinct) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds no usable records for 1500 to 1760.",
     "The Paleobiology Database holds 2 fossil occurrences of this species.",
+    "0 of 1 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "The extinction date is curated from published estimates, not machine-generated."
    ]
   },
@@ -6130,6 +6223,7 @@
     "Name matched to the GBIF Backbone as Smilodon fatalis (family Felidae).",
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
     "The Paleobiology Database holds 39 fossil occurrences of this species.",
+    "The map is drawn from recorded sightings and fossil finds in every period (8 records).",
     "The extinction date is curated from published estimates, not machine-generated."
    ]
   },
@@ -6138,6 +6232,7 @@
    "name": "Sea mink",
    "scientific": "Neogale macrodon",
    "group": "mammal",
+   "habitat": "coast",
    "status": "EX",
    "statusSource": "iucn",
    "extinctYear": 1894,
@@ -6179,6 +6274,7 @@
     "Name matched to the GBIF Backbone as Neovison macrodon (family Mustelidae).",
     "Conservation status (Extinct) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds no usable records for 1500 to 1894.",
+    "0 of 1 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "The extinction date is curated from published estimates, not machine-generated."
    ]
   },
@@ -6187,6 +6283,7 @@
    "name": "Sea otter",
    "scientific": "Enhydra lutris",
    "group": "mammal",
+   "habitat": "coast",
    "status": "EN",
    "statusSource": "iucn",
    "about": "The densest fur of any animal made it a prize. The fur trade nearly wiped it out by 1911; protection and reintroductions rebuilt a population of ~125,000.",
@@ -6259,6 +6356,7 @@
     "Name matched to the GBIF Backbone as Enhydra lutris (family Mustelidae).",
     "Conservation status (Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 18,218 records from 1990 onward; they confirm 3 of 3 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (9, 1,355, 21,486 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -6323,6 +6421,7 @@
     "Name matched to the GBIF Backbone as Panthera uncia (family Felidae).",
     "Conservation status (Vulnerable) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 290 records from 1990 onward; they confirm 9 of 12 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (207 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -6376,6 +6475,7 @@
    "notes": [
     "GBIF has no single entry for this taxon, so lookups use its genus, Dinornis.",
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
+    "0 of 1 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "Population figures and the extinction date are curated from published estimates, not machine-generated."
    ]
   },
@@ -6424,6 +6524,7 @@
     "Name matched to the GBIF Backbone as Rheobatrachus silus (family Myobatrachidae).",
     "Conservation status (Extinct) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 71 records from 1500 to 1983; they confirm 1 of 1 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (71 records).",
     "The extinction date is curated from published estimates, not machine-generated."
    ]
   },
@@ -6518,6 +6619,7 @@
     "Name matched to the GBIF Backbone as Ceratotherium simum simum (family Rhinocerotidae).",
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
     "GBIF holds 4,603 records from 1990 onward; they confirm 8 of 9 countries in the latest range.",
+    "2 of 4 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -6526,6 +6628,7 @@
    "name": "Steller’s sea cow",
    "scientific": "Hydrodamalis gigas",
    "group": "mammal",
+   "habitat": "coast",
    "status": "EX",
    "statusSource": "iucn",
    "extinctYear": 1768,
@@ -6589,6 +6692,7 @@
     "Conservation status (Extinct) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds no usable records for 1500 to 1768.",
     "The Paleobiology Database holds 15 fossil occurrences of this species.",
+    "1 of 2 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "Population figures and the extinction date are curated from published estimates, not machine-generated."
    ]
   },
@@ -6667,6 +6771,7 @@
     "Name matched to the GBIF Backbone as Dicerorhinus sumatrensis (family Rhinocerotidae).",
     "Conservation status (Critically Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 3 records from 1990 onward; they confirm 0 of 1 countries in the latest range.",
+    "0 of 3 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -6728,6 +6833,7 @@
     "Name matched to the GBIF Backbone as Sarcophilus harrisii (family Dasyuridae).",
     "Conservation status (Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 24,079 records from 1990 onward; they confirm 1 of 1 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (24,959 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -6807,6 +6913,7 @@
     "Conservation status (Extinct) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 27 records from 1500 to 1936; they confirm 1 of 1 countries in the latest range.",
     "The Paleobiology Database holds 24 fossil occurrences of this species.",
+    "1 of 2 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "Population figures and the extinction date are curated from published estimates, not machine-generated."
    ]
   },
@@ -6898,6 +7005,7 @@
     "Name matched to the GBIF Backbone as Panthera tigris (family Felidae).",
     "Conservation status (Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 5,050 records from 1990 onward; they confirm 8 of 11 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (69, 4,940 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -6906,6 +7014,7 @@
    "name": "Vaquita",
    "scientific": "Phocoena sinus",
    "group": "mammal",
+   "habitat": "sea",
    "status": "CR",
    "statusSource": "iucn",
    "about": "The world’s rarest marine mammal, found only in the northern Gulf of California. Illegal gillnets set for totoaba kill the last few.",
@@ -6971,6 +7080,7 @@
     "Name matched to the GBIF Backbone as Phocoena sinus (family Phocoenidae).",
     "Conservation status (Critically Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 336 records from 1990 onward; they confirm 1 of 1 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (407 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -7034,6 +7144,7 @@
     "Name matched to the GBIF Backbone as Diceros bicornis longipes (family Rhinocerotidae).",
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
     "GBIF holds no usable records for 1500 to 2011.",
+    "0 of 2 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "Population figures and the extinction date are curated from published estimates, not machine-generated."
    ]
   },
@@ -7094,6 +7205,7 @@
     "Name matched to the GBIF Backbone as Gorilla gorilla (family Hominidae).",
     "Conservation status (Critically Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 437 records from 1990 onward; they confirm 4 of 8 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (350 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -7102,6 +7214,7 @@
    "name": "Whale shark",
    "scientific": "Rhincodon typus",
    "group": "fish",
+   "habitat": "sea",
    "status": "EN",
    "statusSource": "iucn",
    "about": "The biggest fish alive — up to 18 m — a gentle filter feeder. Its Indo-Pacific numbers have fallen by an estimated 63% over 75 years.",
@@ -7169,7 +7282,8 @@
    "notes": [
     "Name matched to the GBIF Backbone as Rhincodon typus (family Rhincodontidae).",
     "Conservation status (Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
-    "GBIF holds 15,042 records from 1990 onward; they confirm 25 of 30 countries in the latest range."
+    "GBIF holds 15,042 records from 1990 onward; they confirm 25 of 30 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (15,094 records)."
    ]
   },
   {
@@ -7235,6 +7349,7 @@
     "Name matched to the GBIF Backbone as Grus americana (family Gruidae).",
     "Conservation status (Endangered) comes from the IUCN Red List, as mirrored by GBIF.",
     "GBIF holds 61,422 records from 1990 onward; they confirm 2 of 2 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (79,198 records).",
     "Population figures are curated from published estimates, not machine-generated."
    ]
   },
@@ -7326,6 +7441,7 @@
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
     "The Paleobiology Database holds 77 fossil occurrences of this species.",
     "Fossil finds added 1 country to the Ice Age range (GRC).",
+    "1 of 4 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "The extinction date is curated from published estimates, not machine-generated."
    ]
   },
@@ -7398,6 +7514,7 @@
     "Name matched to the GBIF Backbone as Coelodonta antiquitatis (family Rhinocerotidae).",
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
     "The Paleobiology Database holds 27 fossil occurrences of this species.",
+    "0 of 2 periods are drawn from their own recorded sightings or fossil finds; the rest use all records, a hand-drawn area, or country outlines (see the data report).",
     "The extinction date is curated from published estimates, not machine-generated."
    ]
   },
@@ -7442,6 +7559,7 @@
     "Name matched to the GBIF Backbone as Glaucopsyche xerces (family Lycaenidae).",
     "The IUCN Red List has no category for this exact taxon, so the status is curated.",
     "GBIF holds 53 records from 1500 to 1941; they confirm 1 of 1 countries in the latest range.",
+    "The map is drawn from recorded sightings and fossil finds in every period (53 records).",
     "The extinction date is curated from published estimates, not machine-generated."
    ]
   }

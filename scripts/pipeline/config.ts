@@ -21,6 +21,18 @@ export const CONFIG = {
   /** PBDB only extends ranges of species that died out before this year. */
   fossilEraBefore: 1500,
 
+  /** Range layers: how a stage's sightings become a picture of where the animal lives. */
+  layers: {
+    /** GBIF holds no useful records before this year. */
+    gbifFrom: 1700,
+    /** Records (or fossil-weight) a stage needs before it is drawn from its own evidence. */
+    minRecords: 5,
+    /** Cells beyond a country's edge that still count, so coasts and small islands keep their records. */
+    landRadius: 1,
+    /** The same for shore-dwelling animals, whose records sit offshore (about 2°). */
+    coastRadius: 6,
+  },
+
   /** Silhouettes may depict a close relative, but no further than this. */
   silhouetteLowestRank: 'family' as const,
 };

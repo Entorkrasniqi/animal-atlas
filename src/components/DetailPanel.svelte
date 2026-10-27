@@ -15,8 +15,10 @@
     onclose: () => void;
     onjump: (year: number) => void;
     onpickcountry: (code: string) => void;
+    /** Where the colours on the map come from for this period, e.g. "GBIF sightings 1990–2025 (4,950 records)". */
+    rangeNote: { source: string; heat: boolean } | null;
   }
-  let { animal, year, onclose, onjump, onpickcountry }: Props = $props();
+  let { animal, year, onclose, onjump, onpickcountry, rangeNote }: Props = $props();
 
   const LIMIT = 16;
 
@@ -129,6 +131,17 @@
       <button type="button" class="link" onclick={() => (showAll = !showAll)}>
         {showAll ? 'Show fewer' : `Show all ${names.length}`}
       </button>
+    {/if}
+    {#if rangeNote}
+      <p class="basis">
+        <strong>Map:</strong> {rangeNote.source}.
+        {#if rangeNote.heat}
+          Pale blue is rare, dark red very common, relative to where this animal is recorded most. Sightings show where people
+          look as well as where animals live, so blank areas can still hold animals.
+        {:else}
+          The whole area is shaded evenly, because nothing says where in it the animal lived or how common it was.
+        {/if}
+      </p>
     {/if}
   </div>
 
@@ -358,6 +371,16 @@
     color: var(--ink-2);
   }
 
+  .basis {
+    margin: 12px 0 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  .basis strong {
+    font-weight: 600;
+    color: var(--ink-2);
+  }
   .countries {
     margin: 0;
     font-size: 13.5px;

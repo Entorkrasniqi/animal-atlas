@@ -46,6 +46,7 @@ export const livingBirds = [
     name: 'Emperor penguin',
     sci: 'Aptenodytes forsteri',
     group: 'bird',
+    habitat: 'coast',
     status: 'NT',
     about:
       'The only penguin to breed in the Antarctic winter. Breeding colonies depend on stable sea ice, which is declining.',
@@ -105,6 +106,7 @@ export const livingBirds = [
     name: 'African penguin',
     sci: 'Spheniscus demersus',
     group: 'bird',
+    habitat: 'coast',
     status: 'CR',
     about:
       'Once millions strong, egg-collecting, guano mining and sardine overfishing have left fewer than 20,000 adults.',
@@ -217,6 +219,7 @@ export const extinctBirds = [
     name: 'Great auk',
     sci: 'Pinguinus impennis',
     group: 'bird',
+    habitat: 'coast',
     status: 'EX',
     extinct: 1844,
     about:
@@ -233,6 +236,7 @@ export const extinctBirds = [
     name: 'Labrador duck',
     sci: 'Camptorhynchus labradorius',
     group: 'bird',
+    habitat: 'coast',
     status: 'EX',
     extinct: 1878,
     about:

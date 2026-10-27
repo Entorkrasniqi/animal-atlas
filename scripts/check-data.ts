@@ -1,9 +1,10 @@
 // Sanity checks for the dataset the app ships. Run with `npm run check:data`.
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { seeds } from '../data/curated';
 import { MIN_YEAR } from '../src/lib/time';
-import type { Animal } from '../src/lib/types';
+import { GRID_H, GRID_W } from '../src/lib/grid';
+import type { Animal, RangeData } from '../src/lib/types';
 import { onMap } from './pipeline/countries';
 
 const file = path.resolve('src/data/generated/animals.json');
@@ -67,11 +68,44 @@ for (const a of animals) {
   }
 }
 
+// --- where in the countries: one layer per range stage -----------------------------------
+const BASES = new Set(['records', 'all-time', 'area', 'countries']);
+const rangesDir = path.resolve('src/data/generated/ranges');
+let drawn = 0;
+for (const a of animals) {
+  const file = path.join(rangesDir, `${a.id}.json`);
+  if (!existsSync(file)) {
+    err(a.id, 'range layers missing (run `npm run data`)');
+    continue;
+  }
+  const { layers } = JSON.parse(readFileSync(file, 'utf8')) as RangeData;
+  if (layers.length !== a.range.length) err(a.id, `${layers.length} range layers for ${a.range.length} stages`);
+  layers.forEach((layer, i) => {
+    const at = `range layer ${i}`;
+    if (!BASES.has(layer.basis)) err(a.id, `${at}: unknown basis "${layer.basis}"`);
+    if (layer.cells.length % 2 !== 0) err(a.id, `${at}: cells is not [cell, count] pairs`);
+    if (layer.basis === 'countries' ? layer.cells.length > 0 : layer.cells.length === 0) err(a.id, `${at}: ${layer.basis} layer has ${layer.cells.length / 2} cells`);
+    if ((layer.basis === 'records' || layer.basis === 'all-time') && layer.records < 1) err(a.id, `${at}: ${layer.basis} layer with no records`);
+    for (let k = 0; k < layer.cells.length; k += 2) {
+      const cell = layer.cells[k];
+      if (!Number.isInteger(cell) || cell < 0 || cell >= GRID_W * GRID_H) err(a.id, `${at}: cell ${cell} is off the grid`);
+      else if (k > 0 && cell <= layer.cells[k - 2]) err(a.id, `${at}: cells not ascending at ${cell}`);
+      if (!(layer.cells[k + 1] > 0)) err(a.id, `${at}: cell ${cell} has no count`);
+    }
+    if (layer.basis === 'records') drawn++;
+  });
+}
+if (existsSync(rangesDir)) {
+  for (const file of readdirSync(rangesDir)) {
+    if (!generatedIds.has(file.replace(/\.json$/, ''))) err(file, 'range file for an animal that is not in the dataset (stale; run `npm run data`)');
+  }
+}
+
 const extinct = animals.filter((a) => a.extinctYear !== undefined).length;
 const withSilhouette = animals.filter((a) => a.silhouette).length;
 console.log(
   `${animals.length} animals (${animals.length - extinct} living, ${extinct} extinct), ${used.size} countries, ` +
-    `${withSilhouette} silhouettes, generated ${generatedAt}`,
+    `${withSilhouette} silhouettes, ${drawn} periods drawn from sightings, generated ${generatedAt}`,
 );
 if (errors.length) {
   console.error(`\n${errors.length} problem(s):\n` + errors.map((e) => '  - ' + e).join('\n'));

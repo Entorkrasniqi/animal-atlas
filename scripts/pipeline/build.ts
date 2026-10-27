@@ -1,10 +1,12 @@
 import type { Seed } from '../../data/curated/helpers';
-import type { Animal, IucnStatus, RangeStage, SourceLink } from '../../src/lib/types';
+import type { Animal, IucnStatus, RangeLayer, RangeStage, SourceLink } from '../../src/lib/types';
 import { CONFIG, toBp } from './config';
 import { onMap } from './countries';
 import { gbifSpeciesUrl, iucnCategory, matchTaxon, occurrenceCountries, sameTaxon, type CountryEvidence } from './gbif';
-import { lookupTaxon, occurrences, pbdbTaxonUrl, type PbdbTaxon } from './pbdb';
+import { buildLandMask, type LandMask } from './landmask';
+import { lookupTaxon, occurrences, pbdbTaxonUrl, type FossilOccurrence, type PbdbTaxon } from './pbdb';
 import { findSilhouette, type SilhouetteHit } from './phylopic';
+import { buildLayers } from './range';
 import { findArticle } from './wikipedia';
 
 export type FlagKind =
@@ -15,6 +17,7 @@ export type FlagKind =
   | 'gbif-unconfirmed'
   | 'gbif-candidates'
   | 'pbdb-extended'
+  | 'range-coarse'
   | 'silhouette-relative'
   | 'no-silhouette'
   | 'no-article';
@@ -27,6 +30,8 @@ export interface Flag {
 
 export interface Built {
   animal: Animal;
+  /** Where the animal lives, one layer per range stage. */
+  layers: RangeLayer[];
   flags: Flag[];
   /** The SVG to write, when a silhouette was found. */
   silhouette?: SilhouetteHit;
@@ -41,6 +46,8 @@ const STATUS_NAME: Record<IucnStatus, string> = {
   EW: 'Extinct in the Wild',
   EX: 'Extinct',
 };
+
+let landMask: LandMask | undefined;
 
 const plural = (n: number, one: string, many = `${one}s`) => `${n.toLocaleString('en-US')} ${n === 1 ? one : many}`;
 const fmtYear = (y: number) => (y <= 0 ? `${Math.abs(y).toLocaleString('en-US')} BCE` : String(y));
@@ -102,6 +109,7 @@ export async function buildAnimal(seed: Seed): Promise<Built> {
   }
 
   // 3. Range evidence: GBIF occurrences (confirm only, never extend) -----------
+  const occKey = taxon ? (taxon.rank === 'SUBSPECIES' ? taxon.key : (taxon.lineage[0]?.key ?? taxon.key)) : null;
   const stages: RangeStage[] = seed.range.map((s) => ({ from: s.from, countries: [...s.countries] }));
   const latest = stages[stages.length - 1].countries;
   const window = !extinct
@@ -110,8 +118,7 @@ export async function buildAnimal(seed: Seed): Promise<Built> {
       ? { from: CONFIG.historicalFrom, to: seed.extinctYear as number }
       : null;
   if (taxon && window) {
-    const occKey = taxon.rank === 'SUBSPECIES' ? taxon.key : (taxon.lineage[0]?.key ?? taxon.key);
-    const ev: CountryEvidence = await occurrenceCountries(occKey, window);
+    const ev: CountryEvidence = await occurrenceCountries(occKey as number, window);
     const confirmed = latest.filter((c) => (ev.byCountry[c] ?? 0) >= CONFIG.gbifConfirmMin);
     const missing = latest.filter((c) => !confirmed.includes(c));
     const span = `${window.from}${extinct ? ` to ${fmtYear(window.to)}` : ' onward'}`;
@@ -137,10 +144,11 @@ export async function buildAnimal(seed: Seed): Promise<Built> {
 
   // 4. Fossil record: Paleobiology Database ------------------------------------
   let pbdb: PbdbTaxon | null = null;
+  let finds: FossilOccurrence[] = [];
   if (extinct) {
     pbdb = await lookupTaxon(seed.hints?.pbdb ?? seed.scientific);
     if (pbdb && pbdb.occurrenceCount > 0) {
-      const finds = await occurrences(pbdb.name);
+      finds = await occurrences(pbdb.name);
       const located = finds.filter((f) => f.country && onMap(f.country));
       notes.push(`The Paleobiology Database holds ${plural(pbdb.occurrenceCount, 'fossil occurrence')} of this species.`);
 
@@ -198,6 +206,14 @@ export async function buildAnimal(seed: Seed): Promise<Built> {
     else if (silhouette.rank !== 'species') flag('silhouette-relative', `Shows ${silhouette.rank} ${silhouette.taxon}.`);
   }
 
+  // 7. Where in those countries: sightings and fossil finds on the world grid -------
+  landMask ??= buildLandMask();
+  // Use the stages as extended by fossil finds, so their countries are inside the layers' masks too.
+  const extended = { ...seed, range: seed.range.map((s, i) => ({ ...s, countries: stages[i].countries })) };
+  const range = await buildLayers(extended, occKey, finds, landMask);
+  notes.push(...range.notes);
+  for (const line of range.concerns) flag('range-coarse', line);
+
   const curated = [seed.population ? 'population figures' : '', extinct ? 'the extinction date' : ''].filter(Boolean);
   if (curated.length) {
     const subject = curated.join(' and ');
@@ -211,6 +227,7 @@ export async function buildAnimal(seed: Seed): Promise<Built> {
     name: seed.name,
     scientific: seed.scientific,
     group: seed.group,
+    habitat: seed.habitat,
     status,
     statusSource,
     extinctYear: seed.extinctYear,
@@ -231,5 +248,5 @@ export async function buildAnimal(seed: Seed): Promise<Built> {
     sources,
     notes,
   };
-  return { animal, flags, silhouette };
+  return { animal, layers: range.layers, flags, silhouette };
 }

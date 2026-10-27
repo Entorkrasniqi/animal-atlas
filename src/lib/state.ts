@@ -18,15 +18,20 @@ export function isExtinctAt(a: Animal, year: number): boolean {
   return a.extinctYear !== undefined && year >= a.extinctYear;
 }
 
-/** Countries where the species is (or, once extinct, last was) found. */
-export function rangeAt(a: Animal, year: number): string[] {
+/** Which range stage applies in `year` (once extinct, the last one it had). */
+export function stageIndexAt(a: Animal, year: number): number {
   const y = isExtinctAt(a, year) ? (a.extinctYear as number) - 1 : year;
-  let current = a.range[0];
-  for (const stage of a.range) {
-    if (stage.from <= y) current = stage;
+  let current = 0;
+  for (let i = 0; i < a.range.length; i++) {
+    if (a.range[i].from <= y) current = i;
     else break;
   }
-  return current.countries;
+  return current;
+}
+
+/** Countries where the species is (or, once extinct, last was) found. */
+export function rangeAt(a: Animal, year: number): string[] {
+  return a.range[stageIndexAt(a, year)].countries;
 }
 
 export function populationAt(a: Animal, year: number): PopReading | null {

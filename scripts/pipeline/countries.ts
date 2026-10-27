@@ -5,6 +5,7 @@ const iso = require('i18n-iso-countries') as {
   registerLocale(locale: unknown): void;
   alpha2ToAlpha3(code: string): string | undefined;
   alpha3ToNumeric(code: string): string | undefined;
+  numericToAlpha3(code: string): string | undefined;
 };
 iso.registerLocale(require('i18n-iso-countries/langs/en.json'));
 
@@ -20,4 +21,9 @@ export function alpha3(alpha2: string): string | null {
 export function onMap(code: string): boolean {
   const numeric = iso.alpha3ToNumeric(code);
   return !!numeric && atlasIds.has(numeric.padStart(3, '0'));
+}
+
+/** Atlas geometry id (zero-padded ISO numeric) to alpha-3, or null for territories without a code. */
+export function numericToAlpha3(numeric: string): string | null {
+  return iso.numericToAlpha3(numeric.replace(/^0+(?=\d)/, '')) ?? null;
 }
