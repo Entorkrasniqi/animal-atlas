@@ -7,6 +7,7 @@
  *
  * Input:  data/curated/*            the editorial layer (facts no open API provides)
  * Output: src/data/generated/animals.json   what the app imports
+ *         src/data/generated/exposure.json   range area and latitudes of living animals (what-if simulator)
  *         src/data/generated/basemap/*.json   Natural Earth states, cities, lakes, rivers (thinned)
  *         public/silhouettes/*.svg + CREDITS.md   self-hosted PhyloPic images
  *         data/generated/report.md  what was changed or needs a human look
@@ -16,6 +17,7 @@ import path from 'node:path';
 import { seeds } from '../../data/curated';
 import { buildBasemap } from './basemap';
 import { buildAnimal, type Built, type Flag, type FlagKind } from './build';
+import { writeExposure } from './exposure';
 import { mapLimit, setRefresh } from './http';
 import type { RangeData } from '../../src/lib/types';
 
@@ -89,6 +91,11 @@ for (const b of built) {
 const keep = new Set(built.map((b) => `${b.animal.id}.json`));
 for (const file of await readdir(OUT_RANGES)) if (!keep.has(file)) await rm(path.join(OUT_RANGES, file));
 
+// --- exposure: how big each living animal's range is and where it lies (for the what-if simulator) ---
+const exposed = await writeExposure(
+  built.filter((b) => b.animal.extinctYear === undefined).map((b) => ({ id: b.animal.id, layer: b.layers[b.layers.length - 1] })),
+);
+
 // --- report ------------------------------------------------------------------------
 const TITLES: Record<FlagKind, string> = {
   'no-gbif-match': 'No GBIF match',
@@ -139,4 +146,5 @@ await writeFile(OUT_REPORT, report);
 
 console.log(`Wrote ${animals.length} animals, ${images.size} silhouettes, ${flags.length} review notes.`);
 console.log(`Base map: ${basemap.admin1} regions, ${basemap.places} places, ${basemap.lakes} lakes, ${basemap.rivers} rivers.`);
+console.log(`Exposure: range area and latitudes for ${exposed} living animals.`);
 console.log(`  ${path.relative('.', OUT_JSON)}\n  ${path.relative('.', OUT_REPORT)}`);

@@ -1,11 +1,13 @@
 <script lang="ts">
   import { dataDate } from '../data';
   import { countryName } from '../lib/geo';
+  import type { Assessment, Scenario } from '../lib/scenario';
   import { isExtinctAt, populationAt, rangeAt } from '../lib/state';
   import { MAX_YEAR, formatCount, formatYear, roundSig, yearsAgo } from '../lib/time';
   import { GROUP_LABEL, STATUS_LABEL, type Animal } from '../lib/types';
   import Icon from './Icon.svelte';
   import PopulationChart from './PopulationChart.svelte';
+  import ScenarioCard from './ScenarioCard.svelte';
   import Silhouette from './Silhouette.svelte';
   import StatusMark from './StatusMark.svelte';
 
@@ -17,8 +19,11 @@
     onpickcountry: (code: string) => void;
     /** Where the colours on the map come from for this period, e.g. "GBIF sightings 1990–2025 (4,950 records)". */
     rangeNote: { source: string; heat: boolean } | null;
+    /** In what-if mode: how the scenario hits this animal, and the sliders behind it. */
+    assessment?: Assessment | null;
+    scenario?: Scenario | null;
   }
-  let { animal, year, onclose, onjump, onpickcountry, rangeNote }: Props = $props();
+  let { animal, year, onclose, onjump, onpickcountry, rangeNote, assessment = null, scenario = null }: Props = $props();
 
   const LIMIT = 16;
 
@@ -93,6 +98,10 @@
       {/if}
     </div>
   </div>
+
+  {#if assessment && scenario}
+    <ScenarioCard {animal} {assessment} {scenario} />
+  {/if}
 
   <dl class="stats">
     <div>

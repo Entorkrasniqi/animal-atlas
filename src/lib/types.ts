@@ -94,6 +94,23 @@ export interface Animal {
   notes?: string[];
 }
 
+/** The app's two modes: browse animals through time, or raise pressures and see who is most at risk. */
+export type Mode = 'explore' | 'whatif';
+
+/** The pressures the what-if scenario can raise (see scenario.ts). */
+export type DriverId = 'warming' | 'habitat' | 'hunting' | 'invasive' | 'pollution' | 'disease';
+
+/** How strongly a pressure threatens one species: 0 not a known threat, 1 minor, 2 moderate, 3 major. */
+export type Level = 0 | 1 | 2 | 3;
+
+/** Where a living animal's range lies, worked out from its range layer (see scripts/pipeline/exposure.ts). */
+export interface Exposure {
+  /** Area covered by its recorded range, in km². */
+  area: number;
+  /** Share of that area in each 10° band of latitude, from 90°S to 90°N (18 numbers adding up to 1). */
+  bands: number[];
+}
+
 export const GROUP_LABEL: Record<Group, string> = {
   mammal: 'Mammals',
   bird: 'Birds',

@@ -5,13 +5,15 @@
   import { zoom, zoomIdentity, type ZoomBehavior, type ZoomTransform } from 'd3-zoom';
   import { buildDetailWorld, buildWorld, loadCountries, loadCountriesDetail, unionPath, type Shape, type World } from '../lib/geo';
   import { buildBasemap, loadBasemap, regionAt, type Basemap, type Hover } from '../lib/basemap';
-  import { ESTIMATE_COLOR, MIN_VISIBLE, densityAt, densityBounds, renderField, type HeatTexture, type RangeView } from '../lib/heat';
+  import { ESTIMATE_COLOR, MIN_VISIBLE, densityAt, densityBounds, renderField, type HeatTexture, type RampKind, type RangeTint, type RangeView } from '../lib/heat';
   import { drawLabels, webZoom, type DrawnPlace } from '../lib/labels';
   import Icon from './Icon.svelte';
 
   interface Props {
     /** The selected animal's range, or null in the overview. */
     range: RangeView | null;
+    /** What-if mode: recolour the range by the scenario instead of by how often the animal was recorded. */
+    tint?: RangeTint | null;
     /** Overview mode: 0..1 intensity per country. */
     heat: Map<string, number> | null;
     /** Country the sidebar is filtered to. */
@@ -27,7 +29,7 @@
     fitReady: boolean;
   }
 
-  let { range, heat, focus, label, onpick, fitCodes, fitKey, fitReady }: Props = $props();
+  let { range, tint = null, heat, focus, label, onpick, fitCodes, fitKey, fitReady }: Props = $props();
 
   let host = $state<HTMLDivElement>();
   let canvas = $state<HTMLCanvasElement>();
@@ -222,6 +224,9 @@
   const RASTER_DELAY = 140;
   let heatTex: HeatTexture | null = null;
   let rasterTimer = 0;
+  let lastPaint = 0;
+  /** A tint that changes while a slider is dragged is repainted at most this often (a paint is costly). */
+  const TINT_EVERY = 120;
 
   function scheduleRaster(delay: number) {
     clearTimeout(rasterTimer);
@@ -237,7 +242,8 @@
       scheduleDraw();
       return;
     }
-    const kind = r.density.uniform ? 'estimate' : r.extinct ? 'extinct' : 'living';
+    const t = tint;
+    const kind: RampKind = t?.kind === 'warming' ? 'warming' : t?.kind === 'score' ? `score-${t.tone}` : r.density.uniform ? 'estimate' : r.extinct ? 'extinct' : 'living';
     // The screen plus a margin, so a small pan doesn't show an unpainted edge.
     const mx = size.w * 0.4;
     const my = size.h * 0.4;
@@ -249,7 +255,9 @@
       [-mx, -my, size.w + mx, size.h + my],
       kind,
       window.devicePixelRatio || 1,
+      t?.kind === 'warming' ? t : undefined,
     );
+    lastPaint = performance.now();
     scheduleDraw();
   }
 
@@ -258,6 +266,14 @@
     void [world, range];
     scheduleRaster(0);
     return () => clearTimeout(rasterTimer);
+  });
+
+  // A new tint (or none): the colours depend on a few numbers only, so a score drifting within one
+  // band repaints nothing, and a warming slider repaints at a pace the eye can follow.
+  const tintKey = $derived(tint ? (tint.kind === 'warming' ? `w${tint.delta.toFixed(1)}` : `s${tint.tone}`) : '');
+  $effect(() => {
+    void tintKey;
+    untrack(() => scheduleRaster(Math.max(0, lastPaint + TINT_EVERY - performance.now())));
   });
 
   /** Land animals stop at the borders of the countries they are known from. */

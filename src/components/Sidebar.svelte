@@ -1,9 +1,13 @@
 <script lang="ts">
-  import { GROUP_LABEL, type Animal, type Group, type StateFilter } from '../lib/types';
+  import { GROUP_LABEL, type Animal, type Group, type Mode, type StateFilter } from '../lib/types';
+  import { flip } from 'svelte/animate';
+  import { toneOf, type Assessment } from '../lib/scenario';
   import { isExtinctAt } from '../lib/state';
   import { formatYear } from '../lib/time';
   import Icon from './Icon.svelte';
   import Logo from './Logo.svelte';
+  import MethodNote from './MethodNote.svelte';
+  import RiskMark from './RiskMark.svelte';
   import Silhouette from './Silhouette.svelte';
   import StatusMark from './StatusMark.svelte';
 
@@ -16,6 +20,10 @@
     group: 'all' | Group;
     stateFilter: StateFilter;
     countryName: string | null;
+    mode: Mode;
+    /** Scenario scores by animal id; set in what-if mode, when the list is ranked by them. */
+    assessments: Map<string, Assessment> | null;
+    onmode: (mode: Mode) => void;
     onselect: (id: string) => void;
     onclearcountry: () => void;
   }
@@ -29,6 +37,9 @@
     group = $bindable(),
     stateFilter = $bindable(),
     countryName,
+    mode,
+    assessments,
+    onmode,
     onselect,
     onclearcountry,
   }: Props = $props();
@@ -39,6 +50,39 @@
     { id: 'alive', label: 'Alive' },
     { id: 'extinct', label: 'Extinct' },
   ];
+
+  const modes: { id: Mode; label: string }[] = [
+    { id: 'explore', label: 'Explore' },
+    { id: 'whatif', label: 'What if…' },
+  ];
+
+  // What-if mode ranks by how much the scenario lifts a score, or by the score itself.
+  type Rank = 'rise' | 'risk';
+  const ranks: { id: Rank; label: string }[] = [
+    { id: 'rise', label: 'Most affected' },
+    { id: 'risk', label: 'Highest risk' },
+  ];
+  let rank = $state<Rank>('rise');
+
+  const ranked = $derived.by(() => {
+    if (!assessments) return [];
+    const score = (a: Animal) => assessments.get(a.id)?.score ?? 0;
+    const rise = (a: Animal) => assessments.get(a.id)?.rise ?? 0;
+    return [...animals].sort((a, b) =>
+      rank === 'rise' ? rise(b) - rise(a) || score(b) - score(a) : score(b) - score(a) || rise(b) - rise(a),
+    );
+  });
+
+  // Where each animal stood in today's order (by today's score), to show how far the scenario moves it.
+  const todayOrder = $derived.by(() => {
+    const order = new Map<string, number>();
+    if (!assessments) return order;
+    const today = (a: Animal) => assessments.get(a.id)?.baseline ?? 0;
+    [...animals].sort((a, b) => today(b) - today(a) || a.name.localeCompare(b.name)).forEach((a, i) => order.set(a.id, i));
+    return order;
+  });
+  // Rows slide to their new place as the sliders move, unless the person asked for less motion.
+  const reduceMotion = typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // The IUCN Red List started in 1964; only show its categories for modern years.
   const showIucn = $derived(year >= 1990);
@@ -69,13 +113,65 @@
   });
 </script>
 
+{#snippet row(a: Animal, move: number = 0)}
+  {@const gone = isExtinctAt(a, year)}
+  {@const result = assessments?.get(a.id)}
+  <button
+    type="button"
+    id="animal-{a.id}"
+    class="item"
+    class:sel={a.id === selectedId}
+    class:gone={!result && gone}
+    class:scored={!!result}
+    style:--tone={result ? `var(--s-${toneOf(result.score)})` : undefined}
+    aria-pressed={a.id === selectedId}
+    onclick={() => onselect(a.id)}
+  >
+    <span class="art" style="--w: 38px; --h: 26px"><Silhouette src={a.silhouette?.file} /></span>
+    <span class="names">
+      <span class="head">
+        <span class="name">{a.name}</span>
+        {#if move !== 0}
+          <span class="move" class:up={move > 0} title="{move > 0 ? 'Up' : 'Down'} {Math.abs(move)} {Math.abs(move) === 1 ? 'place' : 'places'} from today's order">
+            <span aria-hidden="true">{move > 0 ? '▲' : '▼'}{Math.abs(move)}</span>
+            <span class="sr">{move > 0 ? 'up' : 'down'} {Math.abs(move)} from today</span>
+          </span>
+        {/if}
+      </span>
+      <span class="sci">{a.scientific}</span>
+    </span>
+    {#if result}
+      <RiskMark score={result.score} rise={result.rise} />
+    {:else if gone}
+      <StatusMark kind="EX" text="Extinct" />
+    {:else if a.status !== 'EX' && showIucn}
+      <StatusMark kind={a.status} />
+    {:else}
+      <StatusMark kind="ALIVE" text="Alive" />
+    {/if}
+  </button>
+{/snippet}
+
 <aside class="side">
   <header class="brand">
     <h1><Logo size={20} />Animal Atlas</h1>
     <p>Where animals live, how many remain, and where they are gone.</p>
   </header>
 
+  <div class="modes" role="group" aria-label="Mode">
+    {#each modes as m (m.id)}
+      <button type="button" class:on={mode === m.id} aria-pressed={mode === m.id} onclick={() => onmode(m.id)}>{m.label}</button>
+    {/each}
+  </div>
+
   <div class="filters">
+    {#if mode === 'whatif'}
+      <p class="intro">
+        Raise the pressures under the map. Each score shows how hard that world would hit an animal, starting from its status today.
+      </p>
+      <MethodNote />
+    {/if}
+
     <label class="search">
       <span class="sr">Search animals</span>
       <Icon name="search" size={15} />
@@ -90,13 +186,21 @@
       {/each}
     </div>
 
-    <div class="seg" role="group" aria-label="Status in {formatYear(year)}">
-      {#each states as s}
-        <button type="button" class:on={stateFilter === s.id} aria-pressed={stateFilter === s.id} onclick={() => (stateFilter = s.id)}>
-          {s.label}
-        </button>
-      {/each}
-    </div>
+    {#if mode === 'whatif'}
+      <div class="seg two" role="group" aria-label="Rank by">
+        {#each ranks as r (r.id)}
+          <button type="button" class:on={rank === r.id} aria-pressed={rank === r.id} onclick={() => (rank = r.id)}>{r.label}</button>
+        {/each}
+      </div>
+    {:else}
+      <div class="seg" role="group" aria-label="Status in {formatYear(year)}">
+        {#each states as s}
+          <button type="button" class:on={stateFilter === s.id} aria-pressed={stateFilter === s.id} onclick={() => (stateFilter = s.id)}>
+            {s.label}
+          </button>
+        {/each}
+      </div>
+    {/if}
 
     {#if countryName}
       <button type="button" class="country" onclick={onclearcountry}>
@@ -107,48 +211,40 @@
     {/if}
 
     <p class="count" aria-live="polite">
-      {animals.length} of {total} animals
-      {#if stateFilter === 'alive'}alive in {formatYear(year)}{:else if stateFilter === 'extinct'}extinct by {formatYear(year)}{/if}
+      {#if mode === 'whatif'}
+        {animals.length} of {total} living animals, {rank === 'rise' ? 'most affected first' : 'highest score first'}
+      {:else}
+        {animals.length} of {total} animals
+        {#if stateFilter === 'alive'}alive in {formatYear(year)}{:else if stateFilter === 'extinct'}extinct by {formatYear(year)}{/if}
+      {/if}
     </p>
   </div>
 
   <div class="list" bind:this={listEl}>
-    {#each sections as section (section.group)}
-      {#if group === 'all'}
-        <h2>{GROUP_LABEL[section.group]}<span>{section.items.length}</span></h2>
+    {#if mode === 'whatif'}
+      {#if ranked.length}
+        <ul>
+          {#each ranked as a, i (a.id)}
+            <li animate:flip={{ duration: reduceMotion ? 0 : 220 }}>{@render row(a, (todayOrder.get(a.id) ?? i) - i)}</li>
+          {/each}
+        </ul>
+      {:else}
+        <p class="empty">No animals match. Try clearing the search or filters.</p>
       {/if}
-      <ul>
-        {#each section.items as a (a.id)}
-          {@const gone = isExtinctAt(a, year)}
-          <li>
-            <button
-              type="button"
-              id="animal-{a.id}"
-              class="item"
-              class:sel={a.id === selectedId}
-              class:gone
-              aria-pressed={a.id === selectedId}
-              onclick={() => onselect(a.id)}
-            >
-              <span class="art" style="--w: 38px; --h: 26px"><Silhouette src={a.silhouette?.file} /></span>
-              <span class="names">
-                <span class="name">{a.name}</span>
-                <span class="sci">{a.scientific}</span>
-              </span>
-              {#if gone}
-                <StatusMark kind="EX" text="Extinct" />
-              {:else if a.status !== 'EX' && showIucn}
-                <StatusMark kind={a.status} />
-              {:else}
-                <StatusMark kind="ALIVE" text="Alive" />
-              {/if}
-            </button>
-          </li>
-        {/each}
-      </ul>
     {:else}
-      <p class="empty">No animals match. Try clearing the search or filters.</p>
-    {/each}
+      {#each sections as section (section.group)}
+        {#if group === 'all'}
+          <h2>{GROUP_LABEL[section.group]}<span>{section.items.length}</span></h2>
+        {/if}
+        <ul>
+          {#each section.items as a (a.id)}
+            <li>{@render row(a)}</li>
+          {/each}
+        </ul>
+      {:else}
+        <p class="empty">No animals match. Try clearing the search or filters.</p>
+      {/each}
+    {/if}
   </div>
 </aside>
 
@@ -184,6 +280,41 @@
     max-width: 30ch;
     font-size: 12.5px;
     line-height: 1.45;
+    color: var(--muted);
+  }
+
+  .modes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin: 0 20px 14px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .modes button {
+    height: 32px;
+    border: 0;
+    border-left: 1px solid var(--line-strong);
+    background: transparent;
+    color: var(--ink-2);
+    font-size: 13px;
+  }
+  .modes button:first-child {
+    border-left: 0;
+  }
+  .modes button:hover {
+    background: var(--hover);
+  }
+  .modes button.on {
+    background: var(--ink);
+    color: var(--bg);
+    font-weight: 500;
+  }
+
+  .intro {
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.5;
     color: var(--muted);
   }
 
@@ -254,6 +385,9 @@
     border: 1px solid var(--line-strong);
     border-radius: var(--radius);
     overflow: hidden;
+  }
+  .seg.two {
+    grid-template-columns: repeat(2, 1fr);
   }
   .seg button {
     height: 30px;
@@ -375,6 +509,27 @@
     display: flex;
     flex-direction: column;
     gap: 1px;
+  }
+  .head {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    min-width: 0;
+  }
+  .move {
+    flex: none;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .move.up {
+    color: var(--accent-ink);
+  }
+  .item.scored .art,
+  .item.scored.sel .art {
+    /* The silhouette takes the colour of the animal's score. */
+    color: color-mix(in srgb, var(--tone) 80%, var(--ink));
   }
   .name {
     font-size: 13.5px;
