@@ -6,9 +6,12 @@
   "scripts": {
     "dev": "vite",
     "data": "tsx scripts/pipeline/index.ts",
+    "data:exposure": "tsx scripts/derive-exposure.ts",
     "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.node.json",
     "check:data": "tsx scripts/check-data.ts",
-    "build": "npm run check && npm run check:data && vite build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "npm run check && npm run check:data && npm test && vite build",
     "build:fresh": "npm run data -- --refresh && npm run build",
     "preview": "vite preview"
   },
@@ -40,6 +43,7 @@
     "topojson-simplify": "^3.0.3",
     "tsx": "4.19.2",
     "typescript": "~5.9.3",
-    "vite": "^8.3.5"
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
   }
 }

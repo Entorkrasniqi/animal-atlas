@@ -1,6 +1,6 @@
 # Data pipeline report
 
-Generated 2026-10-27 from 100 curated entries. Re-run with `npm run data`.
+Generated 2026-10-31 from 100 curated entries. Re-run with `npm run data`.
 
 ## Coverage
 

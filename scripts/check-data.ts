@@ -2,9 +2,10 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { seeds } from '../data/curated';
+import { ICE_BOUND, PRESSURES } from '../data/curated/pressures';
 import { MIN_YEAR } from '../src/lib/time';
 import { GRID_H, GRID_W } from '../src/lib/grid';
-import type { Animal, RangeData } from '../src/lib/types';
+import type { Animal, Exposure, RangeData } from '../src/lib/types';
 import { onMap } from './pipeline/countries';
 
 const file = path.resolve('src/data/generated/animals.json');
@@ -101,6 +102,44 @@ if (existsSync(rangesDir)) {
   }
 }
 
+// --- what-if simulator: threat levels (curated) and range geometry (generated) -------------------
+const living = animals.filter((a) => a.extinctYear === undefined);
+const livingIds = new Set(living.map((a) => a.id));
+const DRIVER_IDS = ['warming', 'habitat', 'hunting', 'invasive', 'pollution', 'disease'];
+for (const a of living) {
+  const p = PRESSURES[a.id];
+  if (!p) {
+    err(a.id, 'living animal with no threat levels in data/curated/pressures.ts');
+    continue;
+  }
+  for (const key of DRIVER_IDS) {
+    const v = (p as Record<string, unknown>)[key];
+    if (v !== 0 && v !== 1 && v !== 2 && v !== 3) err(a.id, `pressures.ts: ${key} must be 0, 1, 2 or 3`);
+  }
+  if (DRIVER_IDS.every((key) => (p as Record<string, number>)[key] === 0)) err(a.id, 'pressures.ts: every level is 0, so nothing could ever hurt it');
+}
+for (const id of Object.keys(PRESSURES)) if (!livingIds.has(id)) err(id, 'pressures.ts: not a living animal in the dataset');
+for (const id of ICE_BOUND) if (!livingIds.has(id)) err(id, 'pressures.ts: ICE_BOUND names an animal that is not living');
+
+const exposureFile = path.resolve('src/data/generated/exposure.json');
+if (!existsSync(exposureFile)) {
+  err('exposure.json', 'missing (run `npm run data` or `npm run data:exposure`)');
+} else {
+  const exposure = JSON.parse(readFileSync(exposureFile, 'utf8')) as Record<string, Exposure>;
+  for (const a of living) {
+    const e = exposure[a.id];
+    if (!e) {
+      err(a.id, 'no exposure entry (run `npm run data:exposure`)');
+      continue;
+    }
+    if (!(e.area > 0)) err(a.id, 'exposure: area must be positive');
+    if (e.bands.length !== 18) err(a.id, `exposure: ${e.bands.length} latitude bands, expected 18`);
+    const total = e.bands.reduce((sum, b) => sum + b, 0);
+    if (Math.abs(total - 1) > 0.02) err(a.id, `exposure: latitude bands add up to ${total.toFixed(3)}, expected 1`);
+  }
+  for (const id of Object.keys(exposure)) if (!livingIds.has(id)) err(id, 'exposure.json: not a living animal in the dataset (stale)');
+}
+
 // --- base map: states, cities, lakes, rivers -----------------------------------------------
 const basemapDir = path.resolve('src/data/generated/basemap');
 for (const name of ['admin1', 'water', 'places']) {
@@ -129,7 +168,7 @@ const extinct = animals.filter((a) => a.extinctYear !== undefined).length;
 const withSilhouette = animals.filter((a) => a.silhouette).length;
 console.log(
   `${animals.length} animals (${animals.length - extinct} living, ${extinct} extinct), ${used.size} countries, ` +
-    `${withSilhouette} silhouettes, ${drawn} periods drawn from sightings, generated ${generatedAt}`,
+    `${withSilhouette} silhouettes, ${drawn} periods drawn from sightings, ${Object.keys(PRESSURES).length} what-if threat profiles, generated ${generatedAt}`,
 );
 if (errors.length) {
   console.error(`\n${errors.length} problem(s):\n` + errors.map((e) => '  - ' + e).join('\n'));

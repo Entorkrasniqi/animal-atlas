@@ -19,7 +19,21 @@ disappeared.
   threats, the country list, a silhouette, and **sources** for every animal.
 - **Overview** – close the detail panel to see how many atlas animals live in each country at that year
   (this view is still per country).
-- The URL hash (`#animal=tiger&year=1936`) is shareable.
+- **What if…** – switch the sidebar to *What if…* and the timeline gives way to six sliders (warming, habitat
+  loss, hunting and fishing, invasive species, pollution, disease), each also a typed box, plus warming
+  presets (1.5 to 5.4 °C) and a ▶ sweep. Every living animal gets a 0–100 score that rises as you add
+  pressure. What you see change:
+  - the list re-ranks (*Most affected* or *Highest risk*) with sliding rows, ▲/▼ moves from today's order,
+    silhouettes tinted by score, and score bars that show today (dark) plus what the scenario adds (light);
+  - with nothing selected, countries darken where animals are under more pressure, and the right-hand
+    panel summarises the scenario: animals per score band (today → scenario), the five most affected, which
+    pressure moves the most animals, and the average score of each animal group;
+  - with an animal selected, its range on the map is coloured by its scenario score or by the *local
+    warming* across its latitudes (a *Colour range by* switch; habitat loss never redraws the range), and
+    its panel shows which pressures hit it and why.
+
+  See [The what-if simulator](#the-what-if-simulator).
+- The URL hash (`#animal=tiger&year=1936`, or `#whatif&animal=polar-bear&warming=3&habitat=20`) is shareable.
 
 ## Run it
 
@@ -48,8 +62,9 @@ from public sources, checked against that layer, and written to a static file th
 ```
 data/curated/*.ts  ─┐
                     ├─►  scripts/pipeline  ─►  src/data/generated/animals.json   (the app reads this)
-GBIF · PBDB ·       │      (cached, throttled)  public/silhouettes/*.svg + CREDITS.md
-PhyloPic · Wikipedia┘                           data/generated/report.md          (what to review)
+GBIF · PBDB ·       │      (cached, throttled)  src/data/generated/exposure.json (what-if simulator)
+PhyloPic · Wikipedia┘                           public/silhouettes/*.svg + CREDITS.md
+                                                data/generated/report.md          (what to review)
 ```
 
 | Source | What it supplies | How it is used |
@@ -62,6 +77,31 @@ PhyloPic · Wikipedia┘                           data/generated/report.md     
 | [Paleobiology Database](https://paleobiodb.org) | Fossil finds with country, coordinates and age | **Extends** an extinct species' Ice Age range where ≥2 well-dated finds exist, cross-checks curated extinction dates, and draws the Ice Age map |
 | [PhyloPic](https://www.phylopic.org) | Silhouettes | Self-hosted; only CC0, public-domain and CC BY images; falls back to a close relative (genus, then family) and says so |
 | Wikipedia | Article links | Verified to resolve to a real article |
+
+### The what-if simulator
+
+The scores compare animals; they are **not a forecast** of who will go extinct or when. For one living
+animal, `src/lib/scenario.ts` works like this:
+
+1. **Start** from today's IUCN status as a number (Least Concern 5, Near Threatened 15, Vulnerable 30,
+   Endangered 50, Critically Endangered 75), nudged by up to 4 points by how small its population and
+   range are, so animals of one category don't tie.
+2. **Pressure** per slider = how far it is pushed × how much of it reaches the animal × how strongly it
+   threatens this species. *Reach* is the interesting part for warming: `exposure.json` (written by
+   `npm run data`, or alone by `npm run data:exposure`) holds each animal's recorded range area and its
+   share in each 10° latitude band, and warming is applied with a simple pattern: land warms 1.45× the
+   global mean and the sea 0.85× (IPCC AR6 headline figures), rising to 3× in the far north (the Arctic
+   has warmed 3–4× faster since 1979). Sea-ice animals (polar bear, emperor penguin) get the polar factor
+   wherever they are. Habitat loss mostly misses animals of the open sea.
+3. **Fragility** magnifies every pressure up to 1.7× for a tiny population or range (100 animals, 1,000 km²).
+4. **Combine** with `risk = 1 − (1 − start) × Π (1 − pressure)`, so pressures add up but never pass 100.
+
+*How strongly each pressure threatens each species* is an editorial 0–3 level per animal in
+`data/curated/pressures.ts`, read from the threats listed for it. It is a hand-made estimate, not IUCN
+data (the IUCN threats API needs a token), and `npm run check:data` makes sure every living animal has
+one. The six pressures and the figures shown in the app come from the sources linked under *How the
+scores work* in the sidebar. Because the model is a heuristic, the sliders say "X% more than today", not
+a physical quantity, and the rankings are for asking *what hits whom*, not for reading off a date.
 
 ### The base map
 
@@ -112,6 +152,18 @@ Good to know:
 - **Not generated.** Population figures and extinction dates are curated from published estimates;
   the "How this entry was built" note on each animal says so. No open API provides them (the Living
   Planet Index and IUCN API are licence- or token-restricted).
+
+## Tests
+
+```bash
+npm test             # Vitest, about half a second
+npm run test:watch   # re-runs on save
+```
+
+Unit tests sit next to the code (`*.test.ts`) and cover the timeline maths, range and population helpers,
+the heat/colour code, the what-if scoring model, the exposure geometry, and the shipped curated data.
+`npm run build` runs them after the type-check and data validation. Svelte components and pointer
+interaction are not unit-tested.
 
 ## Adding an animal
 

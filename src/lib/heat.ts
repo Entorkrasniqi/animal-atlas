@@ -147,7 +147,10 @@ export function commonness(v: number): string {
 
 // --- colours -----------------------------------------------------------------------
 
-export type RampKind = 'living' | 'extinct' | 'estimate';
+/** The score bands the what-if mode colours by; the colours are the IUCN categories'. */
+export type Tone = 'LC' | 'NT' | 'VU' | 'EN' | 'CR';
+
+export type RampKind = 'living' | 'extinct' | 'estimate' | 'warming' | `score-${Tone}`;
 
 /**
  * Cold to hot, and light to dark. The cold end is a pale blue so a rare record is still visible on
@@ -160,18 +163,41 @@ const EXTINCT_STOPS = ['#c9c6d6', '#9a95b3', '#6a6490', '#3f3a63', '#1f1a3a'];
 const ESTIMATE = '#8c93a8';
 const ESTIMATE_OPACITY = 0.6;
 
-export const RAMPS: Record<'living' | 'extinct', string[]> = { living: LIVING_STOPS, extinct: EXTINCT_STOPS };
 export const ESTIMATE_COLOR = ESTIMATE;
 
-/** CSS gradient for a legend. */
-export function rampGradient(kind: 'living' | 'extinct'): string {
-  const stops = RAMPS[kind];
-  return `linear-gradient(90deg, ${stops.map((c, i) => `${c} ${Math.round((i / (stops.length - 1)) * 100)}%`).join(', ')})`;
-}
+export const TONE_HEX: Record<Tone, string> = { LC: '#8a9a6b', NT: '#b3ad5c', VU: '#d1a23c', EN: '#d9803f', CR: '#a93226' };
+/** Local warming, sand to plum, so it can never be read as the blue-to-red "how common" scale. */
+const WARM_STOPS = ['#f6e7b0', '#f2b66b', '#e5703c', '#b8322a', '#6e1038'];
+/** The local warming (°C) at which the warming colours reach their darkest end. */
+export const WARM_FULL = 12;
 
 function hexToRgb(hex: string): [number, number, number] {
   const n = parseInt(hex.slice(1), 16);
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+function mixHex(a: string, b: string, t: number): string {
+  const [r1, g1, b1] = hexToRgb(a);
+  const [r2, g2, b2] = hexToRgb(b);
+  const part = (x: number, y: number) => Math.round(x + (y - x) * t).toString(16).padStart(2, '0');
+  return `#${part(r1, r2)}${part(g1, g2)}${part(b1, b2)}`;
+}
+
+/** A score colour from pale (rarely recorded) to deep (most recorded), so the sightings still show. */
+const toneStops = (hex: string): string[] => [mixHex(hex, '#ffffff', 0.55), hex, mixHex(hex, '#000000', 0.35)];
+
+function stopsOf(kind: RampKind): string[] {
+  if (kind === 'living') return LIVING_STOPS;
+  if (kind === 'extinct') return EXTINCT_STOPS;
+  if (kind === 'warming') return WARM_STOPS;
+  if (kind === 'estimate') return [ESTIMATE];
+  return toneStops(TONE_HEX[kind.slice(6) as Tone]);
+}
+
+/** CSS gradient for a legend. */
+export function rampGradient(kind: RampKind): string {
+  const stops = stopsOf(kind);
+  return `linear-gradient(90deg, ${stops.map((c, i) => `${c} ${Math.round((i / Math.max(1, stops.length - 1)) * 100)}%`).join(', ')})`;
 }
 
 // Blend in OKLab so the blue-to-sand step stays clean instead of turning grey-green.
@@ -201,10 +227,10 @@ function fromOklab([L, a, b]: [number, number, number]): [number, number, number
   ];
 }
 
-const oklabStops: Partial<Record<'living' | 'extinct', [number, number, number][]>> = {};
+const oklabStops: Partial<Record<RampKind, [number, number, number][]>> = {};
 
-export function rampColor(kind: 'living' | 'extinct', v: number): [number, number, number] {
-  const stops = (oklabStops[kind] ??= RAMPS[kind].map((hex) => toOklab(hexToRgb(hex))));
+export function rampColor(kind: RampKind, v: number): [number, number, number] {
+  const stops = (oklabStops[kind] ??= stopsOf(kind).map((hex) => toOklab(hexToRgb(hex))));
   const x = Math.min(1, Math.max(0, v)) * (stops.length - 1);
   const i = Math.min(stops.length - 2, Math.floor(x));
   const t = x - i;
@@ -228,6 +254,17 @@ function lut(kind: RampKind): Uint8ClampedArray {
   }
   return (luts[kind] = table);
 }
+
+/** Colour a range by local warming instead of by how often it was recorded: hotter where the world warms more. */
+export interface WarmTint {
+  /** Extra global warming, °C. */
+  delta: number;
+  /** How many times the global warming the surface warms at a latitude. */
+  factorAt: (lat: number) => number;
+}
+
+/** How the what-if mode recolours the selected animal's range. */
+export type RangeTint = ({ kind: 'warming' } & WarmTint) | { kind: 'score'; tone: Tone };
 
 // --- painting the field ---------------------------------------------------------------
 
@@ -337,6 +374,7 @@ export function renderField(
   region: [number, number, number, number],
   kind: RampKind,
   maxRatio: number,
+  warm?: WarmTint,
 ): HeatTexture | null {
   const box = densityBounds(d, project, MIN_VISIBLE);
   if (!box) return null;
@@ -440,9 +478,18 @@ export function renderField(
       if (v < MIN_VISIBLE) continue;
       const t = (v >= 1 ? LUT_SIZE - 1 : Math.round(v * (LUT_SIZE - 1))) * 4;
       const o = (y * W + x) * 4;
-      out[o] = table[t];
-      out[o + 1] = table[t + 1];
-      out[o + 2] = table[t + 2];
+      if (warm) {
+        // The colour follows the local warming at this latitude; the opacity still follows the sightings.
+        const w = Math.min(1, Math.max(0, (warm.delta * warm.factorAt(lat)) / WARM_FULL));
+        const c = Math.round(w * (LUT_SIZE - 1)) * 4;
+        out[o] = table[c];
+        out[o + 1] = table[c + 1];
+        out[o + 2] = table[c + 2];
+      } else {
+        out[o] = table[t];
+        out[o + 1] = table[t + 1];
+        out[o + 2] = table[t + 2];
+      }
       out[o + 3] = table[t + 3];
     }
   }
