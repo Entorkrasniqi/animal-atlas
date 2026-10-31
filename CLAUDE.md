@@ -109,8 +109,17 @@ what Explore was showing.
 ### Rendering notes
 
 - Per-animal range files load on selection (`src/data/ranges.ts`). The heat is repainted per pixel when the
-  view settles (`WorldMap.paintHeat` → `heat.renderField`); it is expensive, so avoid triggering repaints
-  on every slider tick (throttle, or key repaints on a small primitive).
+  view settles (`WorldMap.paintHeat` → `heat.renderField`).
+- **Performance (measured in Node, not in a browser):** sampling a wide-ranging animal's range costs about
+  250 ms (wolf, blue whale, polar bear); the what-if scoring of all 58 animals costs 0.3 ms. So:
+  - `renderField` keeps what it sampled per pixel and returns `texture.recolor(kind, warm)`; a tint change
+    (score band, warming slider) only recolours (about 8 ms). Never resample for a colour change.
+  - `App.svelte` keeps two copies of the sliders: `scenario` (live, bound to the bar) and `applied`
+    (follows at most every 80 ms). Everything expensive (re-ranking, summary, country shading, tints) reads
+    `applied`; only the bar and the URL hash read `scenario`.
+  - The 58 list bars (`ScoreBar`) deliberately have no CSS transitions. Rows animate with `animate:flip`.
+  - If lag comes back, profile before guessing: Safari Web Inspector → Timelines, or Chrome DevTools →
+    Performance, while doing the slow action.
 - The legend container is `aria-hidden`; put interactive controls elsewhere.
 - `prefers-reduced-motion` disables CSS transitions globally (`app.css`); handle JS/Svelte animations yourself.
 
@@ -156,7 +165,7 @@ risk      = 1 − (1 − start) × Π(1 − pressure_d)
 
 ## Tests (Vitest, `*.test.ts` next to the code)
 
-96 tests, about half a second. Covered: `lib/time` (timeline scale, formatting), `lib/state` (stages,
+99 tests, about half a second. Covered: `lib/time` (timeline scale, formatting), `lib/state` (stages,
 population interpolation), `lib/heat` (density, ramps, `renderField` painting on a stand-in canvas),
 `lib/scenario` (the whole model), `scripts/pipeline/exposure` (area and latitude bands), and
 `src/data/data.test.ts` (the shipped curated data and the story the model tells with it).
@@ -210,7 +219,7 @@ population interpolation), `lib/heat` (density, ramps, `renderField` painting on
   warming) that recolours the selected animal's range (`RangeTint` in `heat.ts`, `tint` prop on `WorldMap`);
   hash round-trip; data checks.
 
-**Unit tests**: 96 passing (see above). **Not verified in a real browser** (no browser tooling here): pointer interaction, the canvas painting of
+**Unit tests**: 99 passing (see above). **Not verified in a real browser** (no browser tooling here): pointer interaction, the canvas painting of
 the tints on screen, row animation, and layout at narrow widths. The tint colouring was tested with a
 stub canvas (`renderField` called directly): polar-bear range comes out deep red at +3 °C, a lion's orange,
 and 0 °C is the palest sand. Look at it with `npm run dev` before relying on the visuals.

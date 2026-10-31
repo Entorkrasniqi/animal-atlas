@@ -277,6 +277,12 @@ export interface HeatTexture {
   h: number;
   /** How opaque to draw it. Applied when drawing, not when painting. */
   opacity: number;
+  /**
+   * Paints the same pixels in other colours, without sampling the density again. Sampling is what costs
+   * (a quarter of a second for a wide-ranging animal); recolouring is a lookup per pixel. The caller must
+   * redraw afterwards.
+   */
+  recolor: (kind: RampKind, warm?: WarmTint) => void;
 }
 
 /** The map's current pan and zoom, as d3-zoom reports it. */
@@ -414,7 +420,10 @@ export function renderField(
   if (!ctx) return null;
   const image = ctx.createImageData(W, H);
   const out = image.data;
-  const table = lut(kind);
+  // What the sampling finds for each pixel, kept so the colours can change without sampling again.
+  const NONE = 0xffff;
+  const slot = new Uint16Array(W * H).fill(NONE);
+  const pixelLat = new Float32Array(W * H);
   const wx = new Float32Array(4);
   const wy = new Float32Array(4);
   const { values, w, h } = d;
@@ -476,31 +485,47 @@ export function renderField(
         v += row * wy[q];
       }
       if (v < MIN_VISIBLE) continue;
-      const t = (v >= 1 ? LUT_SIZE - 1 : Math.round(v * (LUT_SIZE - 1))) * 4;
-      const o = (y * W + x) * 4;
-      if (warm) {
-        // The colour follows the local warming at this latitude; the opacity still follows the sightings.
-        const w = Math.min(1, Math.max(0, (warm.delta * warm.factorAt(lat)) / WARM_FULL));
-        const c = Math.round(w * (LUT_SIZE - 1)) * 4;
-        out[o] = table[c];
-        out[o + 1] = table[c + 1];
-        out[o + 2] = table[c + 2];
-      } else {
-        out[o] = table[t];
-        out[o + 1] = table[t + 1];
-        out[o + 2] = table[t + 2];
-      }
-      out[o + 3] = table[t + 3];
+      const p = y * W + x;
+      slot[p] = v >= 1 ? LUT_SIZE - 1 : Math.round(v * (LUT_SIZE - 1));
+      pixelLat[p] = lat;
     }
   }
-  ctx.putImageData(image, 0, 0);
 
-  return {
+  const texture: HeatTexture = {
     canvas,
     x: (sx0 - view.x) / view.k,
     y: (sy0 - view.y) / view.k,
     w: W / ratio / view.k,
     h: H / ratio / view.k,
-    opacity: kind === 'estimate' ? ESTIMATE_OPACITY : 1,
+    opacity: 1,
+    recolor: (to, tint) => {
+      const table = lut(to);
+      for (let p = 0; p < slot.length; p++) {
+        const o = p * 4;
+        const s = slot[p];
+        if (s === NONE) {
+          out[o + 3] = 0;
+          continue;
+        }
+        const t = s * 4;
+        if (tint) {
+          // The colour follows the local warming at this latitude; the opacity still follows the sightings.
+          const w = Math.min(1, Math.max(0, (tint.delta * tint.factorAt(pixelLat[p])) / WARM_FULL));
+          const c = Math.round(w * (LUT_SIZE - 1)) * 4;
+          out[o] = table[c];
+          out[o + 1] = table[c + 1];
+          out[o + 2] = table[c + 2];
+        } else {
+          out[o] = table[t];
+          out[o + 1] = table[t + 1];
+          out[o + 2] = table[t + 2];
+        }
+        out[o + 3] = table[t + 3];
+      }
+      ctx.putImageData(image, 0, 0);
+      texture.opacity = to === 'estimate' ? ESTIMATE_OPACITY : 1;
+    },
   };
+  texture.recolor(kind, warm);
+  return texture;
 }

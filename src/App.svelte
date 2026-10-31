@@ -14,6 +14,7 @@
   import { MIN_VISIBLE, WARM_FULL, commonness, densityAt, makeDensity, rampGradient, type Density, type RangeTint, type RangeView } from './lib/heat';
   import {
     BANDS,
+    DRIVERS,
     assess,
     describeScenario,
     readScenario,
@@ -70,6 +71,22 @@
   ];
   let lens = $state<Lens>('score');
   let scenario = $state<Scenario>(initial.scenario);
+  // The sliders follow the pointer at once, but everything built from them (re-ranking 58 rows, the summary,
+  // the map) follows at most this often: doing all that on every pointer event is what makes dragging stutter.
+  const APPLY_EVERY = 80;
+  let applied = $state<Scenario>({ ...initial.scenario });
+  let lastApplied = 0;
+  $effect(() => {
+    const next = { ...scenario };
+    const timer = setTimeout(
+      () => {
+        lastApplied = performance.now();
+        if (DRIVERS.some((d) => applied[d.id] !== next[d.id])) applied = next;
+      },
+      Math.max(0, lastApplied + APPLY_EVERY - performance.now()),
+    );
+    return () => clearTimeout(timer);
+  });
   // What Explore mode was showing, so leaving What-if puts it back.
   let explore = { id: initial.mode === 'explore' ? initial.id : 'tiger', year: initial.mode === 'explore' ? initial.year : MAX_YEAR };
 
@@ -208,7 +225,7 @@
 
   // --- what-if: a score for every living animal under the sliders --------------------
   const assessments = $derived.by<Map<string, Assessment> | null>(() =>
-    mode === 'whatif' ? new Map(living.map((a) => [a.id, assess(a, scenario)])) : null,
+    mode === 'whatif' ? new Map(living.map((a) => [a.id, assess(a, applied)])) : null,
   );
   const assessment = $derived(selected && assessments ? (assessments.get(selected.id) ?? null) : null);
   const countryRisk = $derived(assessments ? riskByCountry(living, assessments) : null);
@@ -217,7 +234,7 @@
   const tint = $derived.by<RangeTint | null>(() => {
     if (mode !== 'whatif' || !selected || !assessment || !rangeView?.density) return null;
     if (lens === 'score') return { kind: 'score', tone: toneOf(assessment.score) };
-    if (lens === 'warming') return { kind: 'warming', delta: scenario.warming, factorAt: warmingFactorAt(selected) };
+    if (lens === 'warming') return { kind: 'warming', delta: applied.warming, factorAt: warmingFactorAt(selected) };
     return null;
   });
   const bandLabel = (tone: string) => BANDS.find((b) => b.tone === tone)?.label ?? '';
@@ -348,7 +365,7 @@
           <span>Loading range…</span>
         {:else if tint?.kind === 'warming'}
           <span class="key">
-            Local warming{scenario.warming > 0 ? ` at +${scenario.warming.toFixed(1)} °C worldwide` : ': raise Warming to see it'}
+            Local warming{applied.warming > 0 ? ` at +${applied.warming.toFixed(1)} °C worldwide` : ': raise Warming to see it'}
             <span>0</span><i class="ramp" style:background={rampGradient('warming')}></i><span>+{WARM_FULL} °C</span>
           </span>
         {:else if tint?.kind === 'score'}
@@ -395,12 +412,12 @@
         onpickcountry={pickCountry}
         {rangeNote}
         {assessment}
-        scenario={mode === 'whatif' ? scenario : null}
+        scenario={mode === 'whatif' ? applied : null}
       />
     </div>
   {:else if mode === 'whatif' && summary}
     <div class="detail">
-      <SummaryPanel {summary} headline={describeScenario(scenario)} onpick={(id) => (selectedId = id)} />
+      <SummaryPanel {summary} headline={describeScenario(applied)} onpick={(id) => (selectedId = id)} />
     </div>
   {/if}
 

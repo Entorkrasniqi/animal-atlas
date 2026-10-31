@@ -224,9 +224,7 @@
   const RASTER_DELAY = 140;
   let heatTex: HeatTexture | null = null;
   let rasterTimer = 0;
-  let lastPaint = 0;
-  /** A tint that changes while a slider is dragged is repainted at most this often (a paint is costly). */
-  const TINT_EVERY = 120;
+
 
   function scheduleRaster(delay: number) {
     clearTimeout(rasterTimer);
@@ -243,7 +241,7 @@
       return;
     }
     const t = tint;
-    const kind: RampKind = t?.kind === 'warming' ? 'warming' : t?.kind === 'score' ? `score-${t.tone}` : r.density.uniform ? 'estimate' : r.extinct ? 'extinct' : 'living';
+    const kind = kindFor(r, t);
     // The screen plus a margin, so a small pan doesn't show an unpainted edge.
     const mx = size.w * 0.4;
     const my = size.h * 0.4;
@@ -257,8 +255,14 @@
       window.devicePixelRatio || 1,
       t?.kind === 'warming' ? t : undefined,
     );
-    lastPaint = performance.now();
     scheduleDraw();
+  }
+
+  /** Which colour scale paints a range: its tint if the what-if mode set one, else how often it was recorded. */
+  function kindFor(r: RangeView, t: RangeTint | null): RampKind {
+    if (t?.kind === 'warming') return 'warming';
+    if (t?.kind === 'score') return `score-${t.tone}`;
+    return r.density?.uniform ? 'estimate' : r.extinct ? 'extinct' : 'living';
   }
 
   // A different animal, period or map size: paint at once.
@@ -268,12 +272,18 @@
     return () => clearTimeout(rasterTimer);
   });
 
-  // A new tint (or none): the colours depend on a few numbers only, so a score drifting within one
-  // band repaints nothing, and a warming slider repaints at a pace the eye can follow.
+  // A new tint (or none) only changes colours, so the pixels already sampled are recoloured instead of
+  // sampled again: a score drifting within one band changes nothing, and a warming slider costs a lookup
+  // per pixel rather than a quarter of a second.
   const tintKey = $derived(tint ? (tint.kind === 'warming' ? `w${tint.delta.toFixed(1)}` : `s${tint.tone}`) : '');
   $effect(() => {
     void tintKey;
-    untrack(() => scheduleRaster(Math.max(0, lastPaint + TINT_EVERY - performance.now())));
+    untrack(() => {
+      const r = range;
+      if (!heatTex || !r?.density) return; // nothing painted yet: the first paint will use the tint
+      heatTex.recolor(kindFor(r, tint), tint?.kind === 'warming' ? tint : undefined);
+      scheduleDraw();
+    });
   });
 
   /** Land animals stop at the borders of the countries they are known from. */

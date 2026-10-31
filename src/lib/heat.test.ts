@@ -146,7 +146,7 @@ describe('painting a range', () => {
       painted++;
       for (let k = 0; k < 3; k++) mean[k] += pixels[i + k];
     }
-    return { texture, painted, rgb: mean.map((m) => (painted ? m / painted : 0)) };
+    return { texture, painted, rgb: mean.map((m) => (painted ? m / painted : 0)), live: pixels };
   }
 
   const polarFactor = (lat: number) => (lat > 50 ? 3 : 1.45);
@@ -183,6 +183,34 @@ describe('painting a range', () => {
     const a = paint(patch(20, 70), 'warming', { delta: 6, factorAt: () => WARM_FULL });
     const b = paint(patch(20, 70), 'warming', { delta: 60, factorAt: () => WARM_FULL });
     expect(b.rgb).toEqual(a.rgb);
+  });
+
+  it('recolours a painted range to exactly what a fresh paint in those colours gives', () => {
+    const warm = { delta: 3, factorAt: polarFactor };
+    const recoloured = paint(patch(20, 60), 'living');
+    recoloured.texture!.recolor('warming', warm);
+    const fresh = paint(patch(20, 60), 'warming', warm);
+    expect(Array.from(recoloured.live)).toEqual(Array.from(fresh.live));
+
+    recoloured.texture!.recolor('score-EN');
+    expect(Array.from(recoloured.live)).toEqual(Array.from(paint(patch(20, 60), 'score-EN').live));
+  });
+
+  it('can go back to the original colours after a recolour', () => {
+    const plain = paint(patch(20, 60), 'living');
+    const before = Array.from(plain.live);
+    plain.texture!.recolor('warming', { delta: 5, factorAt: polarFactor });
+    plain.texture!.recolor('living');
+    expect(Array.from(plain.live)).toEqual(before);
+  });
+
+  it('switches the opacity with the colour scale, since flat hand-drawn areas are drawn see-through', () => {
+    const t = paint(patch(20, 60), 'living').texture!;
+    expect(t.opacity).toBe(1);
+    t.recolor('estimate');
+    expect(t.opacity).toBeLessThan(1);
+    t.recolor('living');
+    expect(t.opacity).toBe(1);
   });
 
   it('keeps the shape from the sightings whatever the colour', () => {

@@ -30,7 +30,6 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    transition: width 0.12s ease-out, left 0.12s ease-out;
   }
   .base {
     left: 0;
